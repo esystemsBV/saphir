@@ -1,0 +1,17 @@
+{
+  "MA": {
+    "bills": [
+      { "image": "/cash/200.png", "value": 200 },
+      { "image": "/cash/100.png", "value": 100 },
+      { "image": "/cash/50.png", "value": 50 },
+      { "image": "/cash/20.png", "value": 20 }
+    ],
+    "coins": [
+      { "image": "/cash/10.png", "value": 10 },
+      { "image": "/cash/5.png", "value": 5 },
+      { "image": "/cash/2.png", "value": 2 },
+      { "image": "/cash/1.png", "value": 1 },
+      { "image": "/cash/1-2.png", "value": 0.5 }
+    ]
+  }
+}
