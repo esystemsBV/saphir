@@ -13,6 +13,8 @@ import { clientsRoutes } from "./routes/clients";
 import { fournisseursRoutes } from "./routes/fournisseurs";
 import { delivery_notesRoutes } from "./routes/delivery_notes";
 import { stockRoutes } from "./routes/stock";
+import { retour_client_notesRoutes } from "./routes/retour_client_notes";
+import { usersRoutes } from "./routes/users";
 
 dotenv.config();
 
@@ -59,6 +61,8 @@ app.use("/clients", clientsRoutes);
 app.use("/fournisseurs", fournisseursRoutes);
 app.use("/stock", stockRoutes);
 app.use("/delivery_notes", delivery_notesRoutes);
+app.use("/retour_client_notes", retour_client_notesRoutes);
+app.use("/users", usersRoutes);
 
 app.get("/uploads/*", (req: any, res) => {
   res.sendFile(path.join(__dirname, "../uploads", req.params[0]));

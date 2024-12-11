@@ -7,12 +7,20 @@ export const DetectArabic = (text: string) => {
   return arabicRegex.test(text);
 };
 
-export const responseMessage = (res: response) => {
+export const responseMessage = ({
+  res,
+  refresh,
+}: {
+  res: response;
+  refresh: () => void;
+}) => {
   if (res.success) {
+    refresh();
     return toast({
       title: t("success"),
     });
   } else {
+    refresh();
     console.log(res.error);
     return toast({
       variant: "destructive",

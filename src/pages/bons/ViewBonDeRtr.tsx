@@ -26,14 +26,16 @@ interface dataProps {
   error: boolean;
 }
 
-export default function DeliveryNoteView() {
+export default function RetourClientNoteView() {
   const { t } = useTranslation();
-  const reference = useLocation().pathname.split("/bon/liv/")[1];
+  const reference = useLocation().pathname.split("/bon/retourclient/")[1];
   const {
     data: deliveryNote,
     loading,
     error,
-  }: dataProps = FetchTableURL({ url: `/delivery_notes/get/${reference}` });
+  }: dataProps = FetchTableURL({
+    url: `/retour_client_notes/get/${reference}`,
+  });
 
   if (loading) {
     return (

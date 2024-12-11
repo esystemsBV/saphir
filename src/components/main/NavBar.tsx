@@ -51,7 +51,7 @@ export default function DashboardNavBar({
   };
 
   return (
-    <div className="border-b border shadow-sm bg-white sticky top-0 flex items-center justify-between px-5 py-2">
+    <div className="border-b border shadow-sm bg-white z-50 sticky top-0 flex items-center justify-between px-5 py-2">
       <div className="flex justify-between text-main items-center w-full">
         <div className="flex items-center justify-center">
           <div className="items-center hidden md:flex">

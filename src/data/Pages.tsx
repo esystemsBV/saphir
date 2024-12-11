@@ -3,7 +3,9 @@ import ViewPack from "@/components/depot/ViewPack";
 import ViewProduct from "@/components/depot/ViewProduct";
 import AddStock from "@/pages/AddStock";
 import BonDelLiv from "@/pages/bons/BonDeLiv";
+import BonDeRtr from "@/pages/bons/BonDeRtr";
 import DeliveryNoteView from "@/pages/bons/ViewBonDeLiv";
+import RetourClientNoteView from "@/pages/bons/ViewBonDeRtr";
 import Clients from "@/pages/clients/Clients";
 import Fournisseurs from "@/pages/clients/Fournisseurs";
 import Families from "@/pages/depot/GesFamilies";
@@ -12,20 +14,25 @@ import ProductsPage from "@/pages/depot/GesProductst";
 import LoginPage from "@/pages/Login";
 import LogOutPage from "@/pages/Logout";
 import Menu from "@/pages/Menu";
+import NewOrder from "@/pages/orders/newOrder";
+import Orders from "@/pages/orders/Orders";
 import PageNotFound from "@/pages/PageNotFound";
 import Settings from "@/pages/Settings";
+import Tests from "@/pages/Tests";
 import {
   CircleDollarSign,
   HomeIcon,
   ListOrderedIcon,
   Plus,
   ShoppingBag,
-  Users,
+  Users as UsersIcon,
   Settings as SettingsIcon,
   Package,
   Package2Icon,
   Home,
 } from "lucide-react";
+import Users from "@/pages/structure/Users";
+import Agencies from "@/pages/structure/Agencies";
 
 export const sidebarItems = [
   {
@@ -40,9 +47,9 @@ export const sidebarItems = [
   },
   {
     label: "Structure",
-    icon: Users,
+    icon: UsersIcon,
     children: [
-      { label: "Équipes", to: "/structure/teams" },
+      { label: "Équipes", to: "/structure/users" },
       { label: "Agences", to: "/structure/agences" },
       { label: "Clients", to: "/clients" },
       { label: "Fournisseurs", to: "/fournisseurs" },
@@ -117,9 +124,14 @@ export const sidebarItems = [
 
 export const pages = [
   {
-    name: "pointOfSale",
+    name: "TEST",
     path: "/",
-    element: "POS",
+    element: Tests,
+  },
+  {
+    name: "bon.retourclient",
+    path: "/bon/retourclient",
+    element: BonDeRtr,
   },
   {
     name: "families.your",
@@ -142,6 +154,11 @@ export const pages = [
     element: ViewPack,
   },
   {
+    name: "retourclient.view",
+    path: "/bon/retourclient/*",
+    element: RetourClientNoteView,
+  },
+  {
     name: "products.your",
     path: "/depot/products",
     element: ProductsPage,
@@ -150,6 +167,26 @@ export const pages = [
     name: "packs.your",
     path: "/depot/packs",
     element: Packs,
+  },
+  {
+    name: "clients.name",
+    path: "/clients",
+    element: Clients,
+  },
+  {
+    name: "orders",
+    path: "/orders/list",
+    element: Orders,
+  },
+  {
+    name: "orders",
+    path: "/structure/users",
+    element: Users,
+  },
+  {
+    name: "orders.new",
+    path: "/orders/new",
+    element: NewOrder,
   },
   {
     name: "clients.name",
@@ -181,6 +218,11 @@ export const pages = [
     name: "stock",
     path: "/depot/stock",
     element: AddStock,
+  },
+  {
+    name: "agencies",
+    path: "/structure/agences",
+    element: Agencies,
   },
 ];
 
@@ -214,14 +256,14 @@ export const refres = [
     elements: [
       {
         title: "L'équipe",
-        link: "/structure/teams",
-        icon: <Users />,
+        link: "/structure/users",
+        icon: <UsersIcon />,
       },
       { title: "Agences", link: "/structure/agences", icon: <Home /> },
       {
         title: "Clients",
         link: "/structure/clients",
-        icon: <Users />,
+        icon: <UsersIcon />,
       },
       {
         title: "Fournisseurs",

@@ -16,12 +16,12 @@ import Error from "../ui/Error";
 import fetchData from "@/apis/HandleGetTable";
 import { responseMessage } from "@/common/Functions";
 import axios from "axios";
-import { delivery_notes, products } from "@/lib/database";
+import { retour_client_notes, products } from "@/lib/database";
 import SelectType from "react-select";
 import { X } from "lucide-react";
 import { DataSelectionDialog } from "../ProductSelectionDialog";
 
-export default function AddDeliveryNotes({
+export default function AddRetourClient_notes({
   close,
   refresh,
   dataToAdd,
@@ -33,7 +33,7 @@ export default function AddDeliveryNotes({
 }: {
   close: () => void;
   refresh: () => void;
-  dataToAdd: delivery_notes | null;
+  dataToAdd: retour_client_notes | null;
   setDataToAdd?: any;
   edit: boolean;
   setEdit: any;
@@ -59,7 +59,7 @@ export default function AddDeliveryNotes({
       !dataToAdd.delivery_date ||
       selectedProducts.length === 0
     ) {
-      setErrorMessage(t("delivery_notes.error.required_fields"));
+      setErrorMessage(t("retour_client_notes.error.required_fields"));
       return;
     }
 
@@ -76,7 +76,7 @@ export default function AddDeliveryNotes({
       };
 
       const response: any = await axios.post(
-        `${def}/delivery_notes/add`,
+        `${def}/retour_client_notes/add`,
         deliveryData
       );
       responseMessage(response.data);
@@ -113,7 +113,7 @@ export default function AddDeliveryNotes({
       };
 
       const response: any = await axios.put(
-        `${def}/delivery_notes/edit/${dataToAdd.reference}`,
+        `${def}/retour_client_notes/edit/${dataToAdd.reference}`,
         deliveryData
       );
       responseMessage(response.data);
@@ -244,7 +244,7 @@ export default function AddDeliveryNotes({
       </div>
       {/* 
       <Input
-        placeholder={t("delivery_notes.product_search")}
+        placeholder={t("retour_client_notes.product_search")}
         className="mb-2 mt-3"
         color="purple"
         onChange={handleProductSearch}

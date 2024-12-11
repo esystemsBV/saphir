@@ -14,7 +14,7 @@ import {
 import { products as ProductProps } from "@/lib/database";
 import brokenImage from "@/assets/brokenImage.png";
 import { def } from "@/data/Links";
-import { ProductSelectionDialog } from "@/components/ProductSelectionDialog";
+// import { DataSelectionDialog } from "@/components/ProductSelectionDialog";
 import { useNavigate } from "react-router-dom";
 
 export default function AddStock() {
@@ -102,10 +102,10 @@ export default function AddStock() {
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label>Select a product</Label>
-                <ProductSelectionDialog
+                {/* <ProductSelectionDialog
                   onSelectProduct={handleProductSelect}
                   products={products}
-                />
+                /> */}
               </div>
 
               {selectedProduct && (

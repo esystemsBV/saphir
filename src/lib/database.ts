@@ -1,12 +1,3 @@
-export interface users {
-  fname: string;
-  lname: string;
-  password: string;
-  phone: string;
-  role: "admin" | "preparator" | "delivery" | "technicocommercial" | "cashier";
-  userUID: string;
-}
-
 export interface response {
   success: boolean;
   error?: string;
@@ -103,6 +94,18 @@ export interface delivery_notes {
   type: "pos" | "client" | "order";
 }
 
+export interface retour_client_notes {
+  reference: number;
+  delivery_date: string;
+  short_delivery_date: string;
+  created_date: string;
+  client: clients;
+  products: products[];
+  total_price: number;
+  status: "in_progress" | "completed";
+  type: "pos" | "client" | "order";
+}
+
 export interface delivery_notes_by_id {
   reference: number;
   delivery_date: string;
@@ -115,4 +118,23 @@ export interface delivery_notes_by_id {
   total_price: number;
   status: "in_progress" | "completed";
   type: "pos" | "client" | "order";
+}
+
+export interface users {
+  reference: number;
+  password: string;
+  fname: string;
+  lname: string;
+  phone: string;
+  email: string;
+  role: "admin" | "preparator" | "delivery" | "technicocommercial" | "cashier";
+  banned?: boolean;
+}
+
+export interface agencies {
+  reference: number;
+  location: string;
+  name: string;
+  phone: string;
+  responsible: string;
 }

@@ -5,12 +5,14 @@ export interface CustomSession extends SessionData {
 }
 
 export interface users {
+  reference: string | number;
   fname: string;
   lname: string;
-  password: string;
   phone: string;
+  email: string;
+  password: string;
   role: "admin" | "preparator" | "delivery" | "technicocommercial" | "cashier";
-  userUID: string;
+  banned?: boolean;
 }
 
 export interface families {

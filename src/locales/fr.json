@@ -162,5 +162,20 @@
     "your": "Vos Fournisseurs",
     "empty": "Pas de Fournisseurs pour le moment."
   },
-  "settings": "Paramètres"
+  "settings": "Paramètres",
+  "neworder": "Ajouter une commande",
+  "orderInfo": "Informations de commande",
+  "customerInfo": "Informations sur le client",
+  "orderDetails": "Détails de la commande",
+  "submitOrder": "Soumettre la commande",
+  "submitting": "Soumission...",
+  "selectAgency": "Sélectionner une agence",
+  "deliveryTime": "Heure de livraison",
+  "fullName": "Nom complet",
+  "phone": "Téléphone",
+  "sameAsPhone": "Identique au téléphone",
+  "city": "Ville",
+  "paymentMethod": "Mode de paiement",
+  "virement": "Virement",
+  "cheque": "Chèque"
 }
