@@ -7,6 +7,7 @@
     "dev": "concurrently \"npx vite\" \"cd backend && npx nodemon --exec npx ts-node src/app.ts\"",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "test": "tsc -b",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -45,7 +46,8 @@
     "react-router-dom": "^7.0.1",
     "react-select": "^5.8.3",
     "tailwind-merge": "^2.5.4",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",

@@ -26,6 +26,8 @@ interface Order {
   phone: string;
   address: string;
   city: string;
+  livreur: string | number;
+  preparateur: string | number;
   statut: string;
   notes: string;
   ncolis: number;

@@ -36,6 +36,7 @@ import Agencies from "@/pages/structure/Agencies";
 import Details from "@/pages/orders/orderDetails";
 import OrdersLabel from "@/pages/orders/OrdersLabel";
 import { users } from "@/lib/database";
+import { Notifications } from "@/pages/Notification";
 
 const allRoles: users["role"][] = [
   "admin",
@@ -58,6 +59,7 @@ export const sidebarItems = [
     to: "/pos",
     roles: ["admin", "caissier"],
   },
+
   {
     label: "Structure",
     icon: UsersIcon,
@@ -252,6 +254,11 @@ export const pages = [
     name: "agencies",
     path: "/structure/agences",
     element: Agencies,
+  },
+  {
+    name: "Notifications",
+    path: "/Notifications",
+    element: Notifications,
   },
 ];
 

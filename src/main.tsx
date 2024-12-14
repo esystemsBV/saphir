@@ -8,4 +8,5 @@ window.addEventListener("load", () => {
     navigator.serviceWorker.register("/serviceworker.js");
   }
 });
+
 createRoot(document.getElementById("root")!).render(<App />);

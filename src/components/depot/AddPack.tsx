@@ -51,6 +51,8 @@ export default function AddPack({
     page: "products",
   });
 
+  console.log(dataToAdd);
+
   const handleAddPack = async (e: any) => {
     e.preventDefault();
     setErrorMessage(false);
@@ -70,7 +72,7 @@ export default function AddPack({
         const formData = new FormData();
         formData.append("reference", `${dataToAdd.reference}`);
         formData.append("name", dataToAdd.name);
-        formData.append("price", dataToAdd.price);
+        formData.append("price", `${dataToAdd.price}`);
         formData.append(
           "productReferences",
           JSON.stringify(

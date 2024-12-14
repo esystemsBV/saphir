@@ -79,9 +79,9 @@ export default function AddStock() {
       <Title title={t("stockadd")} />
 
       <DataSelectionDialog
+        onSelectPack={() => {}}
         onSelectProduct={onSelectProduct}
         ButtonTitle="select-products"
-        table="/products/withfamilyname"
       />
 
       <Table className="border mt-10">

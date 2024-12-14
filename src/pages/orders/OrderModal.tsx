@@ -38,6 +38,8 @@ interface Order {
   city: string;
   statut: string;
   notes: string;
+  livreur: string | number;
+  preparateur: string | number;
   ncolis: number;
   products: products[];
 }
@@ -52,6 +54,18 @@ export function OrderModal({ order, isOpen, onClose }: OrderModalProps) {
   const { t } = useTranslation();
 
   if (!order) return null;
+
+  const sendNotification = async (reference: string | number) => {
+    await axios.post(`${def}/api/send-notification`, {
+      userId: reference,
+      payload: {
+        title: "Nouvelle Commande!",
+        body: "Vous avez une nouvelle commande à livrer.",
+        icon: null,
+        url: `${import.meta.env.VITE_notifs}/orders/label`,
+      },
+    });
+  };
 
   const ValidateOrder = () => {
     const send = async () => {
@@ -97,6 +111,10 @@ export function OrderModal({ order, isOpen, onClose }: OrderModalProps) {
         }
       } else {
         send();
+
+        if (getStatusNextName(order.statut) === "prepared") {
+          sendNotification(order.livreur);
+        }
       }
     }
   };

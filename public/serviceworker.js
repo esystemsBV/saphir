@@ -23,6 +23,21 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
+self.addEventListener("push", (event) => {
+  const data = event.data.json();
+  self.registration.showNotification(data.title, {
+    body: data.body,
+    icon: data.icon || "/Logo-1.png",
+  });
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  if (event.notification.data?.url) {
+    clients.openWindow(event.notification.data.url);
+  }
+});
+
 self.addEventListener("fetch", (event) => {
   if (event.request.mode === "navigate") {
     event.respondWith(

@@ -72,6 +72,7 @@ router.post("/add", (req, res) => {
           } else {
             return res.status(200).json({
               success: true,
+              order_reference: referenceX,
             });
           }
         });
@@ -295,6 +296,8 @@ router.get("/byuserrole&reference/:reference", (req, res) => {
     o.phone,
     o.whatsapp,
     o.address,
+    o.livreur,
+    o.preparateur,
     o.city,
     o.ncolis,
     o.notes,

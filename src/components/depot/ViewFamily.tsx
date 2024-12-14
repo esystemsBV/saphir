@@ -37,7 +37,7 @@ export default function ViewFamily() {
         responseMessage(res.data);
       }
     } catch (error) {
-      responseMessage({ success: false });
+      responseMessage({ res: { success: false } });
     } finally {
       setLoading(false);
     }

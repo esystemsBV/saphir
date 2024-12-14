@@ -29,7 +29,7 @@ export default function AddFamily({
 
   const handleAddFamily = async () => {
     if (!selectedFamily?.name) {
-      responseMessage({ success: false });
+      responseMessage({ res: { success: false } });
     } else {
       setLoadingBtn(true);
 
@@ -52,7 +52,7 @@ export default function AddFamily({
         );
         responseMessage(response.data);
       } catch (error) {
-        responseMessage({ success: false });
+        responseMessage({ res: { success: false } });
       } finally {
         setLoadingBtn(false);
         refresh();
@@ -64,7 +64,7 @@ export default function AddFamily({
 
   const handleEditFamily = async () => {
     if (!selectedFamily?.name) {
-      responseMessage({ success: false });
+      responseMessage({ res: { success: false } });
     } else {
       setLoadingBtn(true);
 
@@ -75,7 +75,7 @@ export default function AddFamily({
         });
         responseMessage(response.data);
       } catch (error) {
-        responseMessage({ success: false });
+        responseMessage({ res: { success: false } });
       } finally {
         setLoadingBtn(false);
         refresh();

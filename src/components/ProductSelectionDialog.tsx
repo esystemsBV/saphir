@@ -29,7 +29,6 @@ interface DataSelectionDialogProps {
   onSelectProduct: (product: any) => void;
   onSelectPack: (pack: any) => void;
   ButtonTitle?: string;
-  table?: string;
   className?: string;
 }
 
@@ -49,7 +48,6 @@ export function DataSelectionDialog({
   onSelectProduct,
   onSelectPack,
   ButtonTitle = "",
-  table = "",
   className = "",
 }: DataSelectionDialogProps) {
   const [open, setOpen] = useState(false);

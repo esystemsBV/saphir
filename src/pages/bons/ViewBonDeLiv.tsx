@@ -1,4 +1,4 @@
-import { delivery_notes_by_id, packs, products } from "@/lib/database";
+import { delivery_notes_by_id } from "@/lib/database";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,

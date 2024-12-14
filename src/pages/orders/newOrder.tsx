@@ -113,6 +113,30 @@ export default function NewOrder() {
 
       if (response.data.success) {
         responseMessage({ res: response.data });
+
+        await axios.post(`${def}/api/send-notification`, {
+          userId: infos.preparateur,
+          payload: {
+            title: "Nouvelle Commande!",
+            body: "Vous avez une nouvelle commande à préparer.",
+            icon: null,
+            url: `${import.meta.env.VITE_notifs}/orders/label`,
+          },
+        });
+
+        admins.map(async (admin) => {
+          await axios.post(`${def}/api/send-notification`, {
+            userId: admin.reference,
+            payload: {
+              title: "Nouvelle Commande!",
+              body: "Vous avez une nouvelle commande à préparer.",
+              icon: null,
+              url: `${import.meta.env.VITE_notifs}/orders/details/${
+                response.data.order_reference
+              }`,
+            },
+          });
+        });
         navigate("/orders/list");
       } else {
         responseMessage({ res: response.data });

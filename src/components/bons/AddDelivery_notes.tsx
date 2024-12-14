@@ -330,7 +330,6 @@ export default function AddDeliveryNotes({
         onSelectProduct={onSelectProduct}
         onSelectPack={onSelectPack}
         ButtonTitle="select-products"
-        table="/products/withfamilyname"
       />
 
       <h1 className="text-lg font-semibold pt-5 text-end">

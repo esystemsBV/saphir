@@ -81,7 +81,7 @@ export default function AddRetourClient_notes({
       );
       responseMessage(response.data);
     } catch (error) {
-      responseMessage({ success: false });
+      responseMessage({ res: { success: false } });
       console.error(error);
     } finally {
       setSelectedProducts([]);
@@ -118,7 +118,7 @@ export default function AddRetourClient_notes({
       );
       responseMessage(response.data);
     } catch (error) {
-      responseMessage({ success: false });
+      responseMessage({ res: { success: false } });
       console.error(error);
     } finally {
       setSelectedProducts([]);
@@ -277,9 +277,9 @@ export default function AddRetourClient_notes({
 
       <DataSelectionDialog
         className="mt-3"
+        onSelectPack={() => {}}
         onSelectProduct={onSelectProduct}
         ButtonTitle="select-products"
-        table="/products/withfamilyname"
       />
 
       {/* Product Table */}

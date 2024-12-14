@@ -41,6 +41,8 @@ interface Order {
   statut: string;
   notes: string;
   ncolis: number;
+  livreur: string | number;
+  preparateur: string | number;
   products: products[];
 }
 
