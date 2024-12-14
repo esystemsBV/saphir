@@ -5,9 +5,17 @@ import { LoadingSpinning } from "@/components/ui/loadingspining";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
-import { agencies } from "@/lib/database";
+import { agencies, users } from "@/lib/database";
 import { def } from "@/data/Links";
 import { responseMessage } from "@/common/Functions";
+import fetchData from "@/apis/HandleGetTable";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function AddAgencies({
   setInfos,
@@ -25,6 +33,8 @@ export default function AddAgencies({
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const { data, loading: loadingUsers }: { data: users[]; loading: boolean } =
+    fetchData({ page: "users" });
 
   const handleAddagencie = async () => {
     setErrorMessage(null);
@@ -83,12 +93,28 @@ export default function AddAgencies({
           value={infos?.phone}
           onChange={handleChange}
         />
-        <Input
-          placeholder={t("responsible")}
-          name="responsible"
+
+        <Select
           value={infos?.responsible}
-          onChange={handleChange}
-        />
+          onValueChange={(e) => setInfos({ ...infos, responsible: e })}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Selectionner un utilisateur" />
+          </SelectTrigger>
+          <SelectContent>
+            {loadingUsers ? (
+              <SelectItem value={"x"} disabled>
+                {t("loading")}
+              </SelectItem>
+            ) : (
+              data.map((val) => (
+                <SelectItem key={val.reference} value={`${val.reference}`}>
+                  {val.fname} {val.lname}
+                </SelectItem>
+              ))
+            )}
+          </SelectContent>
+        </Select>
       </div>
 
       {errorMessage && <ErrorCompo color="red" title={errorMessage} />}

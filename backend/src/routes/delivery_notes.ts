@@ -8,33 +8,64 @@ router.get("/get/:reference", (req, res) => {
   const { reference } = req.params;
 
   const query = `
-    SELECT 
-      dn.reference,
-      dn.delivery_date,
-      dn.created_date,
-      dn.type,
-      dn.remise,
-      dn.status,
-      CASE 
-          WHEN dn.type = 'pos' THEN 'pos' 
-          ELSE CONCAT(c.fname, ' ', c.lname) 
-      END AS client_name,
-      CASE 
-          WHEN dn.type = 'pos' THEN '' 
-          ELSE c.phone 
-      END AS client_phone,
-      p.name AS product_name,
-      p.image AS product_image,
-      dnp.quantity,
-      dnp.price,
-      ((dnp.quantity * dnp.price) - dn.remise) AS product_total_price
-    FROM delivery_notes dn
-    LEFT JOIN clients c ON dn.client_reference = c.reference AND dn.type != 'pos'
-    JOIN delivery_note_products dnp ON dn.reference = dnp.delivery_note_reference
-    JOIN products p ON dnp.product_reference = p.reference
-    WHERE dn.reference = ?`;
+          SELECT 
+        dn.reference,
+        dn.delivery_date,
+        dn.created_date,
+        dn.type,
+        dn.remise,
+        dn.status,
+        CASE 
+            WHEN dn.type = 'pos' THEN 'pos' 
+            ELSE c.fullname
+        END AS client_fullname,
+        CASE 
+            WHEN dn.type = 'pos' THEN '' 
+            ELSE c.phone 
+        END AS client_phone,
+        'product' AS item_type, -- Indicates it's a product
+        p.name AS item_name,
+        p.image AS item_image,
+        dnp.quantity AS item_quantity,
+        dnp.price AS item_price,
+        ((dnp.quantity * dnp.price) - dn.remise) AS item_total_price
+      FROM delivery_notes dn
+      LEFT JOIN clients c ON dn.client_reference = c.reference AND dn.type != 'pos'
+      JOIN delivery_note_products dnp ON dn.reference = dnp.delivery_note_reference
+      JOIN products p ON dnp.product_reference = p.reference
+      WHERE dn.reference = ?
 
-  db.query(query, [reference], (err, results: any) => {
+      UNION ALL
+
+      SELECT 
+        dn.reference,
+        dn.delivery_date,
+        dn.created_date,
+        dn.type,
+        dn.remise,
+        dn.status,
+        CASE 
+            WHEN dn.type = 'pos' THEN 'pos' 
+            ELSE c.fullname
+        END AS client_fullname,
+        CASE 
+            WHEN dn.type = 'pos' THEN '' 
+            ELSE c.phone 
+        END AS client_phone,
+        'pack' AS item_type, -- Indicates it's a pack
+        pk.name AS item_name,
+        pk.image AS item_image,
+        dnpk.quantity AS item_quantity,
+        dnpk.price AS item_price,
+        ((dnpk.quantity * dnpk.price) - dn.remise) AS item_total_price
+      FROM delivery_notes dn
+      LEFT JOIN clients c ON dn.client_reference = c.reference AND dn.type != 'pos'
+      JOIN delivery_note_packs dnpk ON dn.reference = dnpk.delivery_note_reference
+      JOIN packs pk ON dnpk.pack_reference = pk.reference
+      WHERE dn.reference = ?
+`;
+
+  db.query(query, [reference, reference], (err, results: any) => {
     if (err) {
       return res.json({ success: false, error: err });
     }
@@ -43,26 +74,44 @@ router.get("/get/:reference", (req, res) => {
       return res.json({ success: false, message: "Delivery note not found" });
     }
 
-    const totalPrice = results.reduce((sum: any, row: any) => {
-      return sum + +row.product_total_price;
+    const totalPrice = results.reduce((sum: number, row: any) => {
+      return sum + +row.item_total_price;
     }, 0);
+
+    // Separate products and packs into different arrays
+    const products = results
+      .filter((row: any) => row.item_type === "product")
+      .map((row: any) => ({
+        name: row.item_name,
+        quantity: row.item_quantity,
+        price: row.item_price,
+        image: row.item_image,
+        total_price: row.item_total_price,
+      }));
+
+    const packs = results
+      .filter((row: any) => row.item_type === "pack")
+      .map((row: any) => ({
+        name: row.item_name,
+        quantity: row.item_quantity,
+        price: row.item_price,
+        image: row.item_image,
+        total_price: row.item_total_price,
+      }));
 
     const deliveryNote = {
       reference: results[0].reference,
       delivery_date: results[0].delivery_date,
-      client_name: results[0].type === "client" ? results[0].client_name : null,
+      client_fullname:
+        results[0].type === "client" ? results[0].client_fullname : null,
       client_phone:
         results[0].type === "client" ? results[0].client_phone : null,
       status: results[0].status,
       type: results[0].type,
       remise: results[0].remise,
-      total_price: totalPrice.toFixed(2),
-      products: results.map((row: any) => ({
-        name: row.product_name,
-        quantity: row.quantity,
-        sellPrice: row.price,
-        image: row.product_image,
-      })),
+      total_price: totalPrice,
+      products,
+      packs,
     };
 
     return res.json({ success: true, data: deliveryNote });
@@ -70,7 +119,8 @@ router.get("/get/:reference", (req, res) => {
 });
 
 router.post("/add", (req, res) => {
-  const { delivery_date, type, client_reference, products, status } = req.body;
+  const { delivery_date, type, client_reference, products, status, packs } =
+    req.body;
 
   const referenceInDo = customAlphabet("1234567890", 9);
   const reference = referenceInDo();
@@ -79,9 +129,16 @@ router.post("/add", (req, res) => {
       INSERT INTO delivery_notes (reference, delivery_date, type, client_reference, status)
       VALUES (?, ?, ?, ?, ?)
     `;
+
   const productQuery = `
         INSERT INTO delivery_note_products 
           (delivery_note_reference, product_reference, quantity, price)
+        VALUES ?
+      `;
+
+  const packQuery = `
+        INSERT INTO delivery_note_packs 
+          (delivery_note_reference, pack_reference, quantity, price)
         VALUES ?
       `;
 
@@ -153,9 +210,26 @@ router.post("/add", (req, res) => {
               });
             }
 
-            res.status(201).json({
-              success: true,
-            });
+            const setPacks = () => {
+              const packsQueries = packs.map((pack: any) => {
+                const { pack_reference, quantity, price } = pack;
+                return [reference, pack_reference, quantity, price];
+              });
+
+              db.query(packQuery, [packsQueries], (err, result) => {
+                if (err) {
+                  return res
+                    .status(500)
+                    .json({ success: false, error: err.message });
+                } else {
+                  res.status(201).json({
+                    success: true,
+                  });
+                }
+              });
+            };
+
+            setPacks();
           } catch (err) {
             res.status(500).json({
               success: false,
@@ -240,25 +314,27 @@ router.get("/fetch/all", (req, res) => {
       dn.status,
       CASE 
           WHEN dn.type = 'pos' THEN NULL 
-          ELSE c.fname 
-      END AS client_fname,
-      CASE 
-          WHEN dn.type = 'pos' THEN NULL 
-          ELSE c.lname 
-      END AS client_lname,
+          ELSE c.fullname 
+      END AS client_fullname,
       CASE 
           WHEN dn.type = 'pos' THEN NULL 
           ELSE c.phone 
       END AS client_phone,
       p.name AS product_name,
       p.image AS product_image,
+      pa.image AS pack_image,
+      pa.name AS pack_name,
       dnp.quantity,
       dnp.price,
-      ((dnp.quantity * dnp.price) - dn.remise) AS product_total_price
+      dnpa.quantity,
+      dnpa.price,
+      ((dnp.quantity * dnp.price) - dn.remise) +  ((dnpa.quantity * dnpa.price) - dn.remise) AS total_price
     FROM delivery_notes dn
     LEFT JOIN clients c ON dn.client_reference = c.reference AND dn.type != 'pos'
     LEFT JOIN delivery_note_products dnp ON dn.reference = dnp.delivery_note_reference
+    LEFT JOIN delivery_note_packs dnpa ON dn.reference = dnpa.delivery_note_reference
     LEFT JOIN products p ON dnp.product_reference = p.reference
+    LEFT JOIN packs pa ON dnpa.pack_reference = pa.reference
     ORDER BY dn.created_date DESC;
   `;
 
@@ -275,16 +351,16 @@ router.get("/fetch/all", (req, res) => {
           created_date: row.created_date,
           type: row.type,
           status: row.status,
-          total_price: 0,
+          total_price: +row.total_price,
           client:
             row.type === "pos"
               ? null
               : {
-                  fname: row.client_fname,
-                  lname: row.client_lname,
+                  fullname: row.client_fullname,
                   phone: row.client_phone,
                 },
           products: [],
+          packs: [],
         };
       }
 
@@ -296,8 +372,16 @@ router.get("/fetch/all", (req, res) => {
           image: row.product_image,
           total_price: +row.product_total_price,
         });
-        acc[row.delivery_note_reference].total_price +=
-          +row.product_total_price;
+      }
+
+      if (row.pack_name) {
+        acc[row.delivery_note_reference].packs.push({
+          name: row.product_name,
+          quantity: row.quantity,
+          sellPrice: +row.price,
+          image: row.product_image,
+          total_price: +row.product_total_price,
+        });
       }
 
       return acc;

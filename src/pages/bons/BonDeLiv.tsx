@@ -12,7 +12,7 @@ import { Trash2, Eye, EditIcon, X } from "lucide-react";
 import Title from "@/components/ui/Title";
 import Error from "@/components/ui/Error";
 import LoadingSpinner from "@/components/others/LoadingLogo";
-import { delivery_notes, products } from "@/lib/database";
+import { delivery_notes, packs, products } from "@/lib/database";
 import { HandleDelete } from "@/apis/HandleDelete";
 import { Link } from "react-router-dom";
 import FetchTableURL from "@/apis/HandleGetElement";
@@ -24,6 +24,7 @@ export default function BonDeLiv() {
   const { t } = useTranslation();
   const [edit, setEdit] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState<products[]>([]);
+  const [selectedPacks, setSelectedPacks] = useState<packs[]>([]);
   const [add, setAdd] = useState(false);
   const [dataToAdd, setDataToAdd] = useState<any | null>({
     reference: "",
@@ -69,6 +70,8 @@ export default function BonDeLiv() {
           dataToAdd={dataToAdd}
           setDataToAdd={setDataToAdd}
           selectedProducts={selectedProducts}
+          selectedPacks={selectedPacks}
+          setSelectedPacks={setSelectedPacks}
           setSelectedProducts={setSelectedProducts}
           edit={edit}
           setEdit={() => setEdit(!edit)}
@@ -117,7 +120,7 @@ export default function BonDeLiv() {
                 <TableCell>{`${
                   delivery_notes.type === "pos"
                     ? t("client_pos")
-                    : `${delivery_notes.client.fname} ${delivery_notes.client.lname}`
+                    : `${delivery_notes.client.fullname}`
                 }`}</TableCell>
                 <TableCell>
                   {formatDate(delivery_notes.delivery_date)}
@@ -146,7 +149,7 @@ export default function BonDeLiv() {
                               ...delivery_notes.client,
                               label:
                                 delivery_notes.type === "client"
-                                  ? `${delivery_notes.client.fname} ${delivery_notes.client.lname}`
+                                  ? `${delivery_notes.client.fullname}`
                                   : t("client_pos"),
                             },
                           });

@@ -1,153 +1,97 @@
-import { DataSelectionDialog } from "@/components/ProductSelectionDialog";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { def } from "@/data/Links";
-import { products } from "@/lib/database";
-import { useState } from "react";
-import brokenImage from "@/assets/brokenImage.png";
-import { t } from "i18next";
-import { FormPreNumbers } from "@/common/Functions";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Trash2 } from "lucide-react";
+import FetchTableURL from "@/apis/HandleGetElement";
+import { LoadingSpining } from "@/assets/svgs";
 import Title from "@/components/ui/Title";
+import { useUser } from "@/hooks/useUserContext";
+import { products } from "@/lib/database";
+import { t } from "i18next";
+import { Link } from "react-router-dom";
+
+interface Order {
+  order_reference: number;
+  order_date: string;
+  order_time: string;
+  fullname: string;
+  phone: string;
+  address: string;
+  city: string;
+  statut: string;
+  notes: string;
+  ncolis: number;
+  assigned_role: "preparateur" | "livreur";
+  products: products[];
+}
 
 export default function Tests() {
-  const [selectedProducts, setSelectedProducts] = useState<products[]>([]);
+  const { user } = useUser();
+  const { data, loading }: { data: Order[]; loading: boolean; error: any } =
+    FetchTableURL({
+      url: `/orders/byuserrole&reference/${user?.reference}`,
+    });
 
-  const onSelectProduct = (product: products) => {
-    const find = selectedProducts.find(
-      (x) => x.reference === product.reference
-    );
+  const PartOfDay = () => {
+    const currentHour = new Date().getHours();
 
-    const filtred = selectedProducts.filter(
-      (x) => x.reference !== product.reference
-    );
-
-    if (!find) {
-      setSelectedProducts([...selectedProducts, product]);
+    if (currentHour >= 5 && currentHour < 12) {
+      return t("goodmorning");
+    } else if (currentHour >= 12 && currentHour < 17) {
+      return t("goodafternoon");
+    } else if (currentHour >= 17 && currentHour < 21) {
+      return t("goodevening");
     } else {
-      setSelectedProducts([
-        { ...product, quantity: (find.quantity || 1) + 1 },
-        ...filtred,
-      ]);
+      return t("goodnight");
     }
   };
 
-  const handleChangeStock = (value: number, id: number, product: products) => {
-    const filtred = selectedProducts.filter(
-      (x) => x.reference !== product.reference
-    );
+  if (loading) return <LoadingSpining />;
 
-    setSelectedProducts([
-      ...filtred,
-      { ...selectedProducts[id], stock: value },
-    ]);
-  };
-  const hadndleDeleteProduct = (id: number) => {
-    const filtred = selectedProducts.filter(
-      (x) => x.reference !== selectedProducts[id].reference
-    );
+  const filter = (value: string) => data.filter((x) => x.statut === value);
 
-    setSelectedProducts(filtred);
-  };
-
-  const handleSubmitStock = () => {
-    const datatosend = selectedProducts.map((value) => ({
-      stock: value.stock,
-      reference: value.reference,
-    }));
-
-    console.log(datatosend);
-  };
+  const all =
+    user?.role === "preparator"
+      ? ["new"]
+      : user?.role === "delivery"
+      ? ["prepared", "collected", "shipping"]
+      : user?.role === "admin"
+      ? ["new", "prepared", "collected"]
+      : [];
 
   return (
-    <div>
-      <Title title={t("Stock")} />
-
-      <DataSelectionDialog
-        onSelectProduct={onSelectProduct}
-        ButtonTitle="select-products"
-        table="/products/withfamilyname"
+    <section>
+      <Title
+        title={`${PartOfDay()}, ${
+          `${user?.fname} ${user?.lname}` || "Admin"
+        } (${t(user?.role || "")})`}
       />
 
-      <Table className="border mt-10">
-        <TableHeader>
-          <TableRow>
-            <TableHead>{t("image")}</TableHead>
-            <TableHead>{t("products.designation")}</TableHead>
-            {/* <TableHead>{t("quantity")}</TableHead> */}
-            <TableHead>{t("products.pa")}</TableHead>
-            <TableHead>{t("products.pv")}</TableHead>
-            <TableHead>{t("Stock")}</TableHead>
-            <TableHead>{t("products.actions")}</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {selectedProducts && selectedProducts.length > 0 ? (
-            selectedProducts.map((product, id) => (
-              <TableRow key={id}>
-                <TableCell className="w-10">
-                  <img
-                    src={product.image ? `${def}${product.image}` : brokenImage}
-                    alt={product.name}
-                    className="size-12 object-cover rounded-sm bg-main"
-                  />
-                </TableCell>
-                <TableCell className="capitalize">
-                  <p className="text-base font-medium">{product.name}</p>
-                  <p className="text-gray-500 -mt-0.5">
-                    {FormPreNumbers(`${product.reference}`)}
-                  </p>
-                </TableCell>
-                {/* <TableCell className="text-lg">{product.quantity}</TableCell> */}
-                <TableCell className="text-lg">{product.boughtPrice}</TableCell>
-                <TableCell className="text-lg">{product.sellPrice}</TableCell>
-                <TableCell className="text-lg">
-                  <Input
-                    type="number"
-                    value={product.stock || 0}
-                    className="w-12 text-lg text-center flex items-center justify-center"
-                    onChange={(e) =>
-                      handleChangeStock(+e.target.value, id, product)
-                    }
-                  />
-                </TableCell>
-                <TableCell>
-                  <Trash2
-                    className="w-6 h-6 cursor-pointer text-red-500"
-                    onClick={() => hadndleDeleteProduct(id)}
-                  />
-                </TableCell>
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={7} className="h-24 text-center">
-                {t("products.empty")}
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-
-      <div
-        className="fixed p-5 bottom-0 z-50 bg-white left-0 w-full "
-        onClick={handleSubmitStock}
-      >
-        <Button
-          size="lg"
-          className="bg-green-500 hover:bg-green-600 text-white"
-        >
-          {t("submit")}
-        </Button>
-      </div>
-    </div>
+      <section className="grid md:grid-cols-3 gap-5">
+        {all.map((value, id) => (
+          <Link to={`/orders/label?filter=${value}`} key={id}>
+            <div className=" p-7 flex flex-row border shadow-lg items-center rounded-lg justify-between">
+              <div>
+                <h1 className="text-lg capitalize font-medium  w-max">
+                  <span>{CurrentStats(value)}</span>
+                </h1>
+              </div>
+              <h1 className=" text-5xl font-medium w-max text-main">
+                {filter(value).length}
+              </h1>
+            </div>
+          </Link>
+        ))}
+      </section>
+    </section>
   );
+}
+
+function CurrentStats(status: string) {
+  switch (status) {
+    case "new":
+      return t("ord-toprepare");
+    case "prepared":
+      return t("ord-tocollect");
+    case "collected":
+      return t("ord-todeliver");
+    case "shipping":
+      return t("ord-shipping");
+  }
 }

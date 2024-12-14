@@ -33,17 +33,30 @@ import {
 } from "lucide-react";
 import Users from "@/pages/structure/Users";
 import Agencies from "@/pages/structure/Agencies";
+import Details from "@/pages/orders/orderDetails";
+import OrdersLabel from "@/pages/orders/OrdersLabel";
+import { users } from "@/lib/database";
+
+const allRoles: users["role"][] = [
+  "admin",
+  "delivery",
+  "preparator",
+  "technicocommercial",
+  "cashier",
+];
 
 export const sidebarItems = [
   {
     label: "Accueil",
     icon: HomeIcon,
-    to: "/dashboard",
+    to: "/",
+    roles: allRoles,
   },
   {
     label: "Point de vente",
     icon: ShoppingBag,
     to: "/pos",
+    roles: ["admin", "caissier"],
   },
   {
     label: "Structure",
@@ -54,6 +67,7 @@ export const sidebarItems = [
       { label: "Clients", to: "/clients" },
       { label: "Fournisseurs", to: "/fournisseurs" },
     ],
+    roles: ["admin"],
   },
   {
     label: "Commandes",
@@ -64,7 +78,9 @@ export const sidebarItems = [
         to: "/orders/list",
       },
       { label: "Nouvelle com.", to: "/orders/new" },
+      { label: "Label des com.", to: "/orders/label" },
     ],
+    roles: ["admin", "technicocommercial"],
   },
   {
     label: "Depot",
@@ -87,6 +103,7 @@ export const sidebarItems = [
         to: "/depot/stock",
       },
     ],
+    roles: ["admin"],
   },
 
   {
@@ -100,24 +117,26 @@ export const sidebarItems = [
       },
       { icon: Plus, label: "Bon de retour client", to: "/bon/retourclient" },
     ],
+    roles: ["admin", "technicocommercial"],
   },
 
-  {
-    label: "Achats",
-    icon: CircleDollarSign,
-    children: [
-      {
-        icon: ListOrderedIcon,
-        label: "Bon de Rec.",
-        to: "/bon/rec",
-      },
-      { icon: Plus, label: "Bon de retour Frs.", to: "/bon/retourfrs" },
-    ],
-  },
+  // {
+  //   label: "Achats",
+  //   icon: CircleDollarSign,
+  //   children: [
+  //     {
+  //       icon: ListOrderedIcon,
+  //       label: "Bon de Rec.",
+  //       to: "/bon/rec",
+  //     },
+  //     { icon: Plus, label: "Bon de retour Frs.", to: "/bon/retourfrs" },
+  //   ],
+  // },
 
   {
     label: "Paramètres",
     icon: SettingsIcon,
+    roles: ["admin"],
     to: "/settings",
   },
 ];
@@ -149,9 +168,19 @@ export const pages = [
     element: ViewProduct,
   },
   {
+    name: "order.details",
+    path: "/orders/details/*",
+    element: Details,
+  },
+  {
     name: "pack.view",
     path: "/depot/packs/*",
     element: ViewPack,
+  },
+  {
+    name: "orders.label",
+    path: "/orders/label",
+    element: OrdersLabel,
   },
   {
     name: "retourclient.view",

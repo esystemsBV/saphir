@@ -5,7 +5,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
+} from "@/components/ui/acco";
 import {
   Table,
   TableBody,
@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Trash2, Eye, EditIcon } from "lucide-react";
+import { Trash2, Eye, EditIcon, Plus } from "lucide-react";
 import Title from "@/components/ui/Title";
 import Error from "@/components/ui/Error";
 import LoadingSpinner from "@/components/others/LoadingLogo";
@@ -28,6 +28,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import AddFournisseurs from "@/components/clients/AddFournisseur";
+import { Button } from "@/components/ui/button";
 
 export default function Fournisseurs() {
   const { t } = useTranslation();
@@ -74,9 +75,9 @@ export default function Fournisseurs() {
       >
         <AccordionItem value="1">
           <AccordionTrigger>
-            <Title
-              title={edit ? t("fournisseurs.edit") : t("fournisseurs.add")}
-            />
+            <Button className="bg-blue-500 hover:bg-blue-700">
+              <Plus /> {edit ? t("fournisseurs.edit") : t("fournisseurs.add")}
+            </Button>
           </AccordionTrigger>
           <AccordionContent>
             <AddFournisseurs
@@ -114,7 +115,9 @@ export default function Fournisseurs() {
               data.map((fournisseur, id) => (
                 <TableRow key={id}>
                   <TableCell className="capitalize">
-                    <p className="text-base font-medium">{`${fournisseur.fname} ${fournisseur.lname}`}</p>
+                    <p className="text-base font-medium">
+                      {fournisseur.fullname}
+                    </p>
                     <p className="text-gray-500 -mt-0.5">
                       {FormPreNumbers(`${fournisseur.reference}`)}
                     </p>

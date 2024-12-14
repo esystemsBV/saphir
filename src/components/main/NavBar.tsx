@@ -12,10 +12,15 @@ import { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import Logo from "@/assets/logo";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
+import { t } from "i18next";
+import { useUser } from "@/hooks/useUserContext";
 
 export default function DashboardNavBar({
   event,
@@ -26,6 +31,7 @@ export default function DashboardNavBar({
 }) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const navigate = useNavigate();
+  const { user } = useUser();
 
   const enterFullscreen = () => {
     const element = document.documentElement;
@@ -70,32 +76,29 @@ export default function DashboardNavBar({
       </div>
       <div className="flex items-center gap-5">
         <p className="text-xl font-semibold hidden md:block">
-          {new Date().toISOString().slice(11, 16)}
+          {format(new Date(), "p", { locale: fr })}
         </p>
         <DropdownMenu>
-          <DropdownMenuTrigger>
-            <Avatar className="text-white bg-main cursor-pointer">
-              <AvatarImage src={""} />
-              <AvatarFallback>ZE</AvatarFallback>
+          <DropdownMenuTrigger asChild>
+            <Avatar className="cursor-pointer bg-primary text-primary-foreground">
+              <AvatarImage src="" alt="User avatar" />
+              <AvatarFallback>{`${user?.fname[0]}${user?.lname[0]}`}</AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
-          <DropdownMenu>
-            <DropdownMenuContent className="flex items-center gap-2">
-              <div className="w-5 text-black/70">
-                <SettingsIcon />
-              </div>
-              <Link to={"/settings"}>Paramètres</Link>
-            </DropdownMenuContent>
-            <DropdownMenuContent
-              color="danger"
-              className="flex items-center gap-2"
-            >
-              <div className="w-5 text-black/70">
-                <LogOut />
-              </div>
-              <Link to={"/logout"}>Se déconnecter</Link>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <DropdownMenuContent className="w-56">
+            <DropdownMenuItem asChild>
+              <Link to="/settings" className="flex items-center">
+                <SettingsIcon className="mr-2 h-4 w-4" />
+                <span>{t("settings")}</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/logout" className="flex items-center text-red-600">
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>{t("logout")}</span>
+              </Link>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
         </DropdownMenu>
 
         <div className="flex gap-2">

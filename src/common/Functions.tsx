@@ -12,15 +12,15 @@ export const responseMessage = ({
   refresh,
 }: {
   res: response;
-  refresh: () => void;
+  refresh?: () => void;
 }) => {
   if (res.success) {
-    refresh();
+    refresh && refresh();
     return toast({
       title: t("success"),
     });
   } else {
-    refresh();
+    refresh && refresh();
     console.log(res.error);
     return toast({
       variant: "destructive",

@@ -2,6 +2,7 @@
   "dependencies": {
     "@types/express": "^5.0.0",
     "@types/node": "^22.7.5",
+    "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "date-fns": "^4.1.0",
@@ -19,6 +20,7 @@
     "start": "ts-node src/app.ts"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/cookie-parser": "^1.4.7",
     "@types/cors": "^2.8.17",
     "@types/express-session": "^1.18.0",

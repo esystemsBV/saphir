@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -9,70 +9,86 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "@/hooks/use-toast";
 import Title from "@/components/ui/Title";
 import SmallTitle from "@/components/ui/smalltitle";
 import { t } from "i18next";
 import { DataSelectionDialog } from "@/components/ProductSelectionDialog";
-import { products } from "@/lib/database";
-
-interface OrderInfo {
-  orderid: string;
-  agence: string;
-  date: string;
-  fullname: string;
-  phone: string;
-  whatsapp: string;
-  city: string;
-  adress: string;
-  price: string;
-  paymentmethod: string;
-  ncolis: string;
-  notes: string;
-  invoice: boolean;
-  ice?: string;
-  raisonsocial?: string;
-  siegesocial?: string;
-  livreur?: any;
-  preparateur?: any;
-}
-
-interface DataType {
-  agences: { agenceId: string; name: string }[];
-  livreur: { userUID: string; fullname: string }[];
-  preparateur: { userUID: string; fullname: string }[];
-}
+import {
+  agencies,
+  order,
+  packs,
+  paimentsTypes,
+  products,
+  users,
+} from "@/lib/database";
+import fetchData from "@/apis/HandleGetTable";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { def } from "@/data/Links";
+import brokenImage from "@/assets/brokenImage.png";
+import { FormPreNumbers, responseMessage } from "@/common/Functions";
+import FetchTableURL from "@/apis/HandleGetElement";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function NewOrder() {
-  const [infos, setInfos] = useState<OrderInfo>({
-    orderid: `ORD-${Date.now()}`,
-    agence: "",
-    date: new Date().toISOString().split("T")[0],
+  const navigate = useNavigate();
+  const [infos, setInfos] = useState<order>({
     fullname: "",
     phone: "",
     whatsapp: "",
+    address: "",
     city: "",
-    adress: "",
-    price: "",
-    paymentmethod: "",
-    ncolis: "",
+    agence: null,
+    livreur: null,
+    preparateur: null,
+    ncolis: 1,
     notes: "",
-    invoice: false,
+    payment_method: "cash",
+    is_company: false,
+    order_date: new Date().toISOString().split("T")[0],
+    order_time: new Date().toISOString().split("T")[1].split(".")[0],
+    ice: null,
+    siegesocial: null,
+    raisonsocial: null,
   });
-  const [loading, setLoading] = useState(true);
   const [loadingBtn, setLoadingBtn] = useState(false);
-  const [data, setData] = useState<DataType>({
-    agences: [],
-    livreur: [],
-    preparateur: [],
-  });
   const [selectedProduct, setSelectedProduct] = useState<products[]>([]);
+  const {
+    data: agency,
+  }: {
+    data: agencies[];
+  } = fetchData({
+    page: "agencies",
+  });
 
-  const notify = (type: "success" | "error", message: string) =>
-    toast({
-      title: type === "success" ? "Success" : "Error",
-      description: message,
-    });
+  const {
+    data: preparateurs,
+  }: {
+    data: users[];
+  } = FetchTableURL({
+    url: "/users/fetch/preparator",
+  });
+  const {
+    data: livreurs,
+  }: {
+    data: users[];
+  } = FetchTableURL({
+    url: "/users/fetch/delivery",
+  });
+  const {
+    data: admins,
+  }: {
+    data: users[];
+  } = FetchTableURL({
+    url: "/users/fetch/admin",
+  });
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -86,83 +102,56 @@ export default function NewOrder() {
     }));
   };
 
-  const loadMockData = () => {
-    // Mock data to simulate fetching from the backend
-    const mockData = {
-      agences: [
-        { agenceId: "1", name: "Agence 1" },
-        { agenceId: "2", name: "Agence 2" },
-      ],
-      livreur: [
-        { userUID: "1", fullname: "Livreur 1" },
-        { userUID: "2", fullname: "Livreur 2" },
-      ],
-      preparateur: [
-        { userUID: "3", fullname: "Preparateur 1" },
-        { userUID: "4", fullname: "Preparateur 2" },
-      ],
-    };
-
-    setData(mockData);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    setLoading(true);
-    loadMockData();
-    setInfos((prevInfos) => ({
-      ...prevInfos,
-      orderid: `ORD-${Date.now()}`,
-      invoice: false,
-    }));
-  }, []);
-
-  const handleSubmitNewOrder = () => {
+  const handleSubmitNewOrder = async () => {
     setLoadingBtn(true);
 
     try {
-      console.log("Order submitted:", {
-        client: {
-          name: infos.fullname,
-          phone: infos.phone,
-          whatsapp: infos.whatsapp,
-          location: {
-            city: infos.city,
-            address: infos.adress,
-          },
-        },
-        orderDetails: {
-          product: selectedProduct,
-          quantity: infos.ncolis,
-          price: infos.price,
-          paymentMethod: infos.paymentmethod,
-        },
-        team: {
-          agence: infos.agence,
-          livreur: infos.livreur,
-          preparateur: infos.preparateur,
-        },
-        notes: infos.notes,
-        invoice: infos.invoice
-          ? {
-              ice: infos.ice,
-              raisonsocial: infos.raisonsocial,
-              siegesocial: infos.siegesocial,
-            }
-          : null,
+      const response = await axios.post(`${def}/orders/add`, {
+        ...infos,
+        products: selectedProduct,
       });
 
-      notify("success", "Order submitted successfully!");
+      if (response.data.success) {
+        responseMessage({ res: response.data });
+        navigate("/orders/list");
+      } else {
+        responseMessage({ res: response.data });
+      }
     } catch (error) {
       console.error("Error submitting order:", error);
-      notify("error", "Error submitting order.");
     } finally {
       setLoadingBtn(false);
     }
   };
+
   const onSelectProduct = (product: products) => {
     setSelectedProduct([product, ...selectedProduct]);
   };
+
+  const handleEditQuantity = (id: any, value: any) => {
+    const updatedProducts = selectedProduct.map((prod, index) =>
+      index === id ? { ...prod, quantity: value } : prod
+    );
+    setSelectedProduct(updatedProducts);
+  };
+
+  const handleQuantityChange = (id: any, newValue: any) => {
+    const updatedProducts = selectedProduct.map((prod, index) =>
+      index === id ? { ...prod, quantity: newValue } : prod
+    );
+    setSelectedProduct(updatedProducts);
+  };
+
+  const handleDeleteProduct = (id: number) => {
+    const updatedProducts = selectedProduct.filter((_, index) => index !== id);
+    setSelectedProduct(updatedProducts);
+  };
+
+  const totalPrice = selectedProduct.reduce(
+    (total, product) => total + product.sellPrice * (product.quantity || 1),
+    0
+  );
+
   return (
     <>
       <Title title={t("neworder")} />
@@ -172,53 +161,77 @@ export default function NewOrder() {
           <div className="flex flex-col gap-5">
             <Select
               name="agence"
-              value={infos.agence}
-              onValueChange={(value) => setInfos({ ...infos, agence: value })}
+              value={infos.agence?.toString()}
+              onValueChange={(value) => setInfos({ ...infos, agence: +value })}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder={t("selectAgency")} />
               </SelectTrigger>
               <SelectContent>
-                {data.agences.map((agence) => (
-                  <SelectItem key={agence.agenceId} value={agence.agenceId}>
+                {agency.map((agence) => (
+                  <SelectItem
+                    key={agence.reference}
+                    value={agence.reference.toString()}
+                  >
                     {agence.name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <Input
-              type="datetime-local"
-              name="date"
-              value={infos.date}
-              onChange={handleChange}
-              placeholder={t("deliveryDate")}
-            />
-
-            <DataSelectionDialog
-              table="/products/withfamilyname"
-              onSelectProduct={onSelectProduct}
-              ButtonTitle={t("products.add")}
-            />
+            <section className="flex gap-5">
+              <Input
+                type="date"
+                name="order_date"
+                value={infos.order_date}
+                onChange={handleChange}
+                placeholder={t("deliveryDate")}
+              />
+              <Input
+                type="time"
+                name="order_time"
+                value={infos.order_time}
+                onChange={handleChange}
+                placeholder={t("deliveryTime")}
+              />
+            </section>
           </div>
         </section>
 
         <section>
           <SmallTitle title={t("customerInfo")} />
           <div className="flex flex-col gap-5">
-            <Input
-              type="text"
-              name="fullname"
-              value={infos.fullname}
-              onChange={handleChange}
-              placeholder={t("fullName")}
-            />
-            <Input
-              type="text"
-              name="phone"
-              value={infos.phone}
-              onChange={handleChange}
-              placeholder={t("phone")}
-            />
+            <section className="flex gap-5">
+              <Input
+                type="text"
+                name="fullname"
+                value={infos.fullname}
+                onChange={handleChange}
+                placeholder={t("fullName")}
+              />
+              <Input
+                type="text"
+                name="ncolis"
+                value={infos.ncolis}
+                onChange={handleChange}
+                placeholder={t("ncolis")}
+              />
+            </section>
+            <section className="flex gap-5">
+              <Input
+                type="text"
+                name="phone"
+                value={infos.phone}
+                onChange={handleChange}
+                placeholder={t("phone")}
+              />
+              <Input
+                type="text"
+                name="whatsapp"
+                value={infos.whatsapp}
+                onChange={handleChange}
+                placeholder={t("whatsapp")}
+              />
+            </section>
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="same-as-phone"
@@ -231,54 +244,274 @@ export default function NewOrder() {
               />
               <label htmlFor="same-as-phone">{t("sameAsPhone")}</label>
             </div>
-            <Input
-              type="text"
-              name="city"
-              value={infos.city}
-              onChange={handleChange}
-              placeholder={t("city")}
-            />
-            <Input
-              type="text"
-              name="adress"
-              value={infos.adress}
-              onChange={handleChange}
-              placeholder={t("address")}
-            />
+            <section className="flex gap-5">
+              <Input
+                type="text"
+                name="city"
+                value={infos.city}
+                onChange={handleChange}
+                placeholder={t("city")}
+              />
+              <Input
+                type="text"
+                name="address"
+                value={infos.address}
+                onChange={handleChange}
+                placeholder={t("address")}
+              />
+            </section>
           </div>
         </section>
 
         <section>
           <SmallTitle title={t("orderDetails")} />
-          <div className="flex flex-col gap-5">
+
+          <DataSelectionDialog
+            onSelectPack={(pack: packs) => console.log(pack)}
+            onSelectProduct={onSelectProduct}
+            ButtonTitle={t("products.add")}
+          />
+
+          <Table
+            style={{ display: selectedProduct.length > 0 ? "table" : "none" }}
+            aria-label="table"
+            className="mt-2"
+          >
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t("image")}</TableHead>
+                <TableHead>{t("products.designation")}</TableHead>
+                <TableHead>{t("products.pv")}</TableHead>
+                <TableHead>{t("products.pa")}</TableHead>
+                <TableHead>{t("quantity")}</TableHead>
+                <TableHead>{t("delete")}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {selectedProduct && selectedProduct.length > 0 ? (
+                selectedProduct.map((prod, id) => (
+                  <TableRow key={id}>
+                    <TableCell className="w-20">
+                      <img
+                        src={prod.image ? `${def}${prod.image}` : brokenImage}
+                        alt={prod.name}
+                        className="size-12 object-cover rounded-sm bg-main"
+                      />
+                    </TableCell>
+                    <TableCell className="capitalize">
+                      <p className="text-base font-medium">{prod.name}</p>
+                      <p className="text-gray-500 -mt-0.5">
+                        {FormPreNumbers(`${prod.reference}`)}
+                      </p>
+                    </TableCell>
+                    <TableCell className="text-lg">{prod.sellPrice}</TableCell>
+                    <TableCell className="text-lg">
+                      {prod.boughtPrice}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() =>
+                            handleEditQuantity(
+                              id,
+                              Math.max((prod?.quantity || 1) - 1, 1)
+                            )
+                          }
+                          className=" w-7 cursor-pointer bg-main flex items-center justify-center text-center text-white rounded-full h-7"
+                        >
+                          -
+                        </button>
+                        <input
+                          value={prod.quantity}
+                          onChange={(e) =>
+                            handleQuantityChange(
+                              id,
+                              Math.max(1, Number(e.target.value))
+                            )
+                          }
+                          className="text-center focus:outline-main py-1 duration-300 outline-none rounded-lg md:w-20 w-10"
+                        />
+                        <button
+                          onClick={() =>
+                            handleEditQuantity(id, (prod.quantity || 1) + 1)
+                          }
+                          className=" w-7 cursor-pointer bg-main flex items-center justify-center text-center text-white rounded-full h-7"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </TableCell>
+
+                    <TableCell>
+                      <div
+                        onClick={() => handleDeleteProduct(id)}
+                        className="w-7 cursor-pointer bg-red-600 flex items-center justify-center text-center text-white rounded-full h-7"
+                      >
+                        X
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={6} className="h-24 text-center">
+                    {t("packs.empty")}
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+
+          <hr />
+
+          <div className="flex gap-5 mt-5">
             <Input
               type="number"
               name="price"
-              value={infos.price}
-              onChange={handleChange}
-              placeholder={t("price")}
+              value={totalPrice}
+              disabled
+              placeholder={t("montant")}
             />
             <Select
-              name="paymentmethod"
-              value={infos.paymentmethod}
-              onValueChange={(value) =>
-                setInfos({ ...infos, paymentmethod: value })
+              name="payment_method"
+              value={infos.payment_method}
+              onValueChange={(value: paimentsTypes) =>
+                setInfos({ ...infos, payment_method: value })
               }
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder={t("paymentMethod")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="cash">{t("cash")}</SelectItem>
-                <SelectItem value="virement">{t("virement")}</SelectItem>
-                <SelectItem value="cheque">{t("cheque")}</SelectItem>
+                {["cash", "tpe", "cheque", "effect", "virement", "others"].map(
+                  (value) => (
+                    <SelectItem value={value}>{t(value)}</SelectItem>
+                  )
+                )}
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="flex items-center mt-5 space-x-2">
+            <Checkbox
+              onCheckedChange={(checked) =>
+                setInfos({
+                  ...infos,
+                  is_company: checked ? true : false,
+                })
+              }
+            />
+            <label>{t("withFacturation")}</label>
+          </div>
+        </section>
+
+        {infos.is_company && (
+          <section>
+            <SmallTitle title={t("facturationdetails")} />
+            <section className="flex gap-5">
+              <Input
+                type="text"
+                name="ice"
+                value={infos.ice || ""}
+                onChange={handleChange}
+                placeholder={t("ice")}
+              />
+              <Input
+                type="text"
+                name="raisonsocial"
+                value={infos.raisonsocial || ""}
+                onChange={handleChange}
+                placeholder={t("raisonsocial")}
+              />
+              <Input
+                type="text"
+                name="siegesocial"
+                value={infos.siegesocial || ""}
+                onChange={handleChange}
+                placeholder={t("siegesocial")}
+              />
+            </section>
+          </section>
+        )}
+
+        <section>
+          <SmallTitle title={t("rolesManagement")} />
+          <div className="flex flex-col gap-5">
+            <section className="flex gap-5">
+              <Select
+                disabled={livreurs.length === 0 && admins.length === 0}
+                name="livreur"
+                value={infos.livreur?.toString()}
+                onValueChange={(value) =>
+                  setInfos({ ...infos, livreur: +value })
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={t("selectdeliverylocation")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {livreurs.map((livreur) => (
+                    <SelectItem
+                      key={livreur.reference}
+                      value={livreur.reference.toString()}
+                    >
+                      {livreur.fname} {livreur.lname}
+                    </SelectItem>
+                  ))}
+                  {admins.map((preparateur) => (
+                    <SelectItem
+                      key={preparateur.reference}
+                      value={preparateur.reference.toString()}
+                    >
+                      {preparateur.fname} {preparateur.lname}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select
+                disabled={preparateurs.length === 0 && admins.length === 0}
+                name="preparateur"
+                value={infos.preparateur?.toString()}
+                onValueChange={(value) =>
+                  setInfos({ ...infos, preparateur: +value })
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue
+                    placeholder={t("selectpreparationuserlocation")}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {preparateurs.map((preparateur) => (
+                    <SelectItem
+                      key={preparateur.reference}
+                      value={preparateur.reference.toString()}
+                    >
+                      {preparateur.fname} {preparateur.lname}
+                    </SelectItem>
+                  ))}
+                  {admins.map((preparateur) => (
+                    <SelectItem
+                      key={preparateur.reference}
+                      value={preparateur.reference.toString()}
+                    >
+                      {preparateur.fname} {preparateur.lname}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </section>
+
+            <textarea
+              placeholder={t("notes")}
+              className="border border-gray-200 rounded-lg px-3 focus:outline-main h-20 text-sm py-2"
+            />
           </div>
         </section>
 
         <Button onClick={handleSubmitNewOrder} disabled={loadingBtn}>
-          {loadingBtn ? t("submitting") : t("submitOrder")}
+          {loadingBtn ? t("loading") : t("submit")}
         </Button>
       </main>
     </>

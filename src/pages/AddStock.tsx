@@ -1,185 +1,162 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+import { DataSelectionDialog } from "@/components/ProductSelectionDialog";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { products as ProductProps } from "@/lib/database";
-import brokenImage from "@/assets/brokenImage.png";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { def } from "@/data/Links";
-// import { DataSelectionDialog } from "@/components/ProductSelectionDialog";
-import { useNavigate } from "react-router-dom";
+import { products } from "@/lib/database";
+import { useState } from "react";
+import brokenImage from "@/assets/brokenImage.png";
+import { t } from "i18next";
+import { FormPreNumbers, responseMessage } from "@/common/Functions";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Trash2 } from "lucide-react";
+import Title from "@/components/ui/Title";
+import axios from "axios";
 
 export default function AddStock() {
-  const [selectedProduct, setSelectedProduct] = useState<ProductProps | null>(
-    null
-  );
-  const [newStock, setNewStock] = useState("");
-  const [products, setProducts] = useState<ProductProps[]>([]);
-  const navigate = useNavigate();
-  const [responseMessage, setResponseMessage] = useState<{
-    message: string;
-    success: boolean;
-  } | null>(null);
+  const [selectedProducts, setSelectedProducts] = useState<products[]>([]);
 
-  const handleProductSelect = (product: ProductProps) => {
-    setSelectedProduct(product);
-    setNewStock((product.stock || 0).toString());
-  };
+  const onSelectProduct = (product: products) => {
+    const find = selectedProducts.find(
+      (x) => x.reference === product.reference
+    );
 
-  const getProducts = async () => {
-    try {
-      const response = await axios.get(`${def}/products/withfamilyname`);
+    const filtred = selectedProducts.filter(
+      (x) => x.reference !== product.reference
+    );
 
-      setProducts(response.data.data);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      setProducts([]);
+    if (!find) {
+      setSelectedProducts([...selectedProducts, product]);
+    } else {
+      setSelectedProducts([
+        { ...product, quantity: (find.quantity || 1) + 1 },
+        ...filtred,
+      ]);
     }
   };
 
-  useEffect(() => {
-    getProducts();
-  }, []);
+  const handleChangeStock = (value: number, product: products) => {
+    const updatedProducts = selectedProducts.map((item) =>
+      item.reference === product.reference ? { ...item, newstock: value } : item
+    );
 
-  const getChangeType = () => {
-    if (!selectedProduct) return "egal";
-    const currentStock = selectedProduct.stock || 0;
-    const newStockValue = parseInt(newStock, 10);
-    if (newStockValue > currentStock) return "up";
-    if (newStockValue < currentStock) return "down";
-    return "egal";
+    setSelectedProducts(updatedProducts);
   };
 
-  const updateStock = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!selectedProduct) return;
+  const hadndleDeleteProduct = (id: number) => {
+    const filtred = selectedProducts.filter(
+      (x) => x.reference !== selectedProducts[id].reference
+    );
 
-    const reference = selectedProduct.reference;
-    const newStockValue = parseInt(newStock, 10);
-    const changeType = getChangeType();
+    setSelectedProducts(filtred);
+  };
+
+  const handleSubmitStock = async () => {
+    const datatosend = {
+      products: selectedProducts.map((value) => ({
+        stock: value.newstock,
+        difference: (value.newstock || 0) - (value.stock || 0),
+        reference: value.reference,
+        type: (value.newstock || 0) - (value.stock || 0) > 0 ? "up" : "down",
+      })),
+    };
 
     try {
-      const response = await axios.post(`${def}/stock/add`, {
-        reference,
-        quantity: newStockValue,
-        type: changeType,
-      });
+      const response = await axios.post(`${def}/stock/add`, datatosend);
 
-      if (response.status === 200) {
-        navigate(`/depot/products/${selectedProduct.reference}`);
-      } else {
-        setResponseMessage({
-          message: "Failed to update stock",
-          success: false,
-        });
-      }
-    } catch (error) {
-      console.error("Error updating stock:", error);
-      setResponseMessage({
-        message: "An error occurred while updating stock",
-        success: false,
-      });
-    }
+      responseMessage({ res: response.data });
+    } catch (error) {}
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <Card className="w-full max-w-md mx-auto">
-        <CardHeader>
-          <CardTitle>Stock Management</CardTitle>
-          <CardDescription>Update stock for products</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={updateStock}>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>Select a product</Label>
-                {/* <ProductSelectionDialog
-                  onSelectProduct={handleProductSelect}
-                  products={products}
-                /> */}
-              </div>
+    <div>
+      <Title title={t("stockadd")} />
 
-              {selectedProduct && (
-                <>
-                  <div className="space-y-2">
-                    <Label>Selected Product</Label>
-                    <div className="flex items-center space-x-4">
-                      <img
-                        src={
-                          selectedProduct.image
-                            ? `${def}${selectedProduct.image}`
-                            : brokenImage
-                        }
-                        alt={selectedProduct.name}
-                        width={50}
-                        height={50}
-                      />
-                      <div>
-                        <p className="font-medium">{selectedProduct.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          Ref: {selectedProduct.reference}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          Family: {selectedProduct.familyName}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+      <DataSelectionDialog
+        onSelectProduct={onSelectProduct}
+        ButtonTitle="select-products"
+        table="/products/withfamilyname"
+      />
 
-                  <div className="space-y-2">
-                    <Label htmlFor="current-stock">Current Stock</Label>
-                    <Input
-                      id="current-stock"
-                      value={selectedProduct.stock}
-                      disabled
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="new-stock">New Stock</Label>
-                    <Input
-                      id="new-stock"
-                      name="newStock"
-                      type="number"
-                      value={newStock}
-                      onChange={(e) => setNewStock(e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <Button
-                    disabled={getChangeType() === "egal"}
-                    type="submit"
-                    className="w-full"
-                  >
-                    Update Stock
-                  </Button>
-                </>
-              )}
-            </div>
-          </form>
-        </CardContent>
-        <CardFooter>
-          {responseMessage && (
-            <p
-              className={`text-sm ${
-                responseMessage.success ? "text-green-600" : "text-red-600"
-              }`}
-            >
-              {responseMessage.message}
-            </p>
+      <Table className="border mt-10">
+        <TableHeader>
+          <TableRow>
+            <TableHead>{t("image")}</TableHead>
+            <TableHead>{t("products.designation")}</TableHead>
+            {/* <TableHead>{t("quantity")}</TableHead> */}
+            <TableHead>{t("products.pa")}</TableHead>
+            <TableHead>{t("products.pv")}</TableHead>
+            <TableHead>{t("Stock")}</TableHead>
+            <TableHead>{t("Stock Réel")}</TableHead>
+            <TableHead>{t("products.actions")}</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {selectedProducts && selectedProducts.length > 0 ? (
+            selectedProducts.map((product, id) => (
+              <TableRow key={id}>
+                <TableCell className="w-10">
+                  <img
+                    src={product.image ? `${def}${product.image}` : brokenImage}
+                    alt={product.name}
+                    className="size-12 object-cover rounded-sm bg-main"
+                  />
+                </TableCell>
+                <TableCell className="capitalize">
+                  <p className="text-base font-medium">{product.name}</p>
+                  <p className="text-gray-500 -mt-0.5">
+                    {FormPreNumbers(`${product.reference}`)}
+                  </p>
+                </TableCell>
+                {/* <TableCell className="text-lg">{product.quantity}</TableCell> */}
+                <TableCell className="text-lg">{product.boughtPrice}</TableCell>
+                <TableCell className="text-lg">{product.sellPrice}</TableCell>
+                <TableCell className="text-lg">{product.stock}</TableCell>
+                <TableCell className="text-lg">
+                  <Input
+                    type="number"
+                    value={product.newstock || 0}
+                    className="w-20 text-lg text-center flex items-center justify-center"
+                    onChange={(e) =>
+                      handleChangeStock(+e.target.value, product)
+                    }
+                  />
+                </TableCell>
+                <TableCell>
+                  <Trash2
+                    className="w-6 h-6 cursor-pointer text-red-500"
+                    onClick={() => hadndleDeleteProduct(id)}
+                  />
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={7} className="h-24 text-center">
+                {t("products.empty")}
+              </TableCell>
+            </TableRow>
           )}
-        </CardFooter>
-      </Card>
+        </TableBody>
+      </Table>
+
+      <div
+        className="fixed p-5 bottom-0 z-40 bg-white left-0 w-full "
+        onClick={handleSubmitStock}
+      >
+        <Button
+          size="lg"
+          className="bg-green-500 hover:bg-green-600 text-white"
+        >
+          {t("submit")}
+        </Button>
+      </div>
     </div>
   );
 }

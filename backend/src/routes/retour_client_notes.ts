@@ -17,7 +17,7 @@ router.get("/get/:reference", (req, res) => {
       dn.status,
       CASE 
           WHEN dn.type = 'pos' THEN 'pos' 
-          ELSE CONCAT(c.fname, ' ', c.lname) 
+          ELSE CONCAT(c.fullname, ' ', c.fullname) 
       END AS client_name,
       CASE 
           WHEN dn.type = 'pos' THEN '' 
@@ -246,11 +246,11 @@ router.get("/fetch/all", (req, res) => {
       dn.status,
       CASE 
           WHEN dn.type = 'pos' THEN NULL 
-          ELSE c.fname 
+          ELSE c.fullname 
       END AS client_fname,
       CASE 
           WHEN dn.type = 'pos' THEN NULL 
-          ELSE c.lname 
+          ELSE c.fullname 
       END AS client_lname,
       CASE 
           WHEN dn.type = 'pos' THEN NULL 
@@ -286,8 +286,7 @@ router.get("/fetch/all", (req, res) => {
             row.type === "pos"
               ? null
               : {
-                  fname: row.client_fname,
-                  lname: row.client_lname,
+                  fullname: row.client_fullname,
                   phone: row.client_phone,
                 },
           products: [],

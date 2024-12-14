@@ -37,9 +37,9 @@ export default function AddFournisseurs({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!data?.fname || !data?.lname || !data?.phone) {
+    if (!data?.fullname || !data?.phone) {
       responseMessage({
-        success: false,
+        res: { success: false },
       });
       return;
     }
@@ -51,7 +51,7 @@ export default function AddFournisseurs({
         !data.company_ice ||
         !data.company_tp)
     ) {
-      responseMessage({ success: false });
+      responseMessage({ res: { success: false } });
       return;
     }
 
@@ -63,8 +63,7 @@ export default function AddFournisseurs({
         : `${def}/fournisseurs/add`;
       const payload = {
         address: data.address,
-        fname: data.fname,
-        lname: data.lname,
+        fullname: data.fullname,
         phone: data.phone,
         type: data.type || "personal",
         company_rc: data.type === "company" ? data.company_rc : null,
@@ -79,7 +78,7 @@ export default function AddFournisseurs({
 
       responseMessage(response.data);
     } catch (error) {
-      responseMessage({ success: false });
+      responseMessage({ res: { success: false } });
     } finally {
       setLoadingBtn(false);
       refresh();
@@ -92,35 +91,6 @@ export default function AddFournisseurs({
     <div>
       <form onSubmit={handleSubmit}>
         <div className="grid md:grid-cols-2 gap-5">
-          <Input
-            placeholder={t("First Name")}
-            name="fname"
-            value={data?.fname || ""}
-            required
-            onChange={(e) => setData({ ...data, fname: e.target.value })}
-          />
-          <Input
-            placeholder={t("Last Name")}
-            name="lname"
-            value={data?.lname || ""}
-            required
-            onChange={(e) => setData({ ...data, lname: e.target.value })}
-          />
-          <Input
-            placeholder={t("Phone Number")}
-            name="phone"
-            value={data?.phone || ""}
-            required
-            onChange={(e) => setData({ ...data, phone: e.target.value })}
-          />
-          <Input
-            placeholder={t("address")}
-            name="address"
-            value={data?.address || ""}
-            required
-            onChange={(e) => setData({ ...data, address: e.target.value })}
-          />
-
           <Select
             name="type"
             value={data?.type || "personal"}
@@ -145,6 +115,29 @@ export default function AddFournisseurs({
               </SelectGroup>
             </SelectContent>
           </Select>
+
+          <Input
+            placeholder={t("fullname")}
+            name="fullname"
+            value={data?.fullname || ""}
+            required
+            onChange={(e) => setData({ ...data, fullname: e.target.value })}
+          />
+
+          <Input
+            placeholder={t("Phone Number")}
+            name="phone"
+            value={data?.phone || ""}
+            required
+            onChange={(e) => setData({ ...data, phone: e.target.value })}
+          />
+          <Input
+            placeholder={t("address")}
+            name="address"
+            value={data?.address || ""}
+            required
+            onChange={(e) => setData({ ...data, address: e.target.value })}
+          />
 
           {data?.type === "company" && (
             <>
@@ -187,7 +180,7 @@ export default function AddFournisseurs({
         <Button
           disabled={!data || loadingBtn}
           type="submit"
-          className="my-5 text-white bg-main"
+          className="my-5 text-white bg-green-500 hover:bg-green-700"
         >
           {loadingBtn ? <LoadingLogo /> : t("submit")}
         </Button>

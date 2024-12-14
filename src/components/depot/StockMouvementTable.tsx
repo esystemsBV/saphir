@@ -47,7 +47,7 @@ export default function StockMovementTable({
             </TableCell>
             <TableCell>{t(movement.source)}</TableCell>
             <TableCell>
-              {movement.type === "up" ? "+" : "-"}
+              {movement.quantity > 0 && `${movement.type === "up" ? "+" : "-"}`}
               {movement.quantity}
             </TableCell>
             <TableCell>{formatDate(movement.date)}</TableCell>

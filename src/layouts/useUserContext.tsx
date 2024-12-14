@@ -1,5 +1,5 @@
-import { users } from "@/lib/database";
 import React, { createContext, useContext, useState, ReactNode } from "react";
+import { users } from "../lib/database";
 
 interface UserContextProps {
   user: users | null;

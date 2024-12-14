@@ -1,30 +1,39 @@
 import express from "express";
 import { db } from "../config/sqldb";
-import { ResultSetHeader } from "mysql2";
 const router = express.Router();
 
 router.post("/add", (req, res) => {
-  const { reference, quantity, type } = req.body;
+  const { products } = req.body;
 
-  const stockQuery = `    
+  products.map((product: any) => {
+    const { reference, stock, type, difference } = product;
+
+    const stockQuery = `    
     UPDATE stock 
     SET quantity = ?
     WHERE product_id = ?`;
 
-  const transactionsq = `INSERT INTO transactions (product_id, transaction_type, quantity, source, transaction_date) VALUES (?, ?, ?, ?, ?)`;
+    const stockData = [stock, reference];
 
-  const stockData = [quantity, reference];
-  const transactionData = [reference, type, quantity, "stockadd", new Date()];
+    const transactionsq = `INSERT INTO transactions (product_id, transaction_type, quantity, source, transaction_date) VALUES (?, ?, ?, ?, ?)`;
 
-  db.query(stockQuery, stockData, (err, result) => {
-    if (err) return res.json({ success: false, error: err });
-    else {
-      db.query(transactionsq, transactionData, (err, result) => {
-        if (err) return res.json({ success: false, error: err });
+    const transactionData = [
+      reference,
+      type,
+      difference,
+      "stockadd",
+      new Date(),
+    ];
 
-        res.json({ success: true, error: err });
-      });
-    }
+    db.query(stockQuery, stockData, (err, result) => {
+      if (err) return res.json({ success: false, error: err });
+      else {
+        db.query(transactionsq, transactionData, (err, result) => {
+          if (err) return res.json({ success: false, error: err });
+          else res.json({ success: true, error: err });
+        });
+      }
+    });
   });
 });
 

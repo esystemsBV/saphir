@@ -5,7 +5,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
+} from "@/components/ui/acco";
 import {
   Table,
   TableBody,
@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Trash2, Eye, EditIcon } from "lucide-react";
+import { Trash2, Eye, EditIcon, Plus } from "lucide-react";
 import Title from "@/components/ui/Title";
 import Error from "@/components/ui/Error";
 import LoadingSpinner from "@/components/others/LoadingLogo";
@@ -28,6 +28,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
 
 export default function Clients() {
   const { t } = useTranslation();
@@ -74,7 +75,9 @@ export default function Clients() {
       >
         <AccordionItem value="1">
           <AccordionTrigger>
-            <Title title={edit ? t("clients.edit") : t("clients.add")} />
+            <Button className="bg-blue-500 hover:bg-blue-700">
+              <Plus /> {edit ? t("clients.edit") : t("clients.add")}
+            </Button>{" "}
           </AccordionTrigger>
           <AccordionContent>
             <AddClient
@@ -112,7 +115,7 @@ export default function Clients() {
               data.map((client, id) => (
                 <TableRow key={id}>
                   <TableCell className="capitalize">
-                    <p className="text-base font-medium">{`${client.fname} ${client.lname}`}</p>
+                    <p className="text-base font-medium">{`${client.fullname}`}</p>
                     <p className="text-gray-500 -mt-0.5">
                       {FormPreNumbers(`${client.reference}`)}
                     </p>

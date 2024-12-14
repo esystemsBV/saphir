@@ -32,13 +32,6 @@ export default function ViewPack() {
     url: `/packs/getWithProducts/${reference}`,
   });
 
-  const totalPackPrice =
-    products?.reduce(
-      (sum, product) =>
-        sum + product.productSellPrice * product.productQuantity,
-      0
-    ) || 0;
-
   return (
     <div>
       <Title title={t("packProducts", { reference })} />
@@ -55,7 +48,7 @@ export default function ViewPack() {
               </p>
               <p>
                 <span className="text-main">{t("packPrice")}</span> :{" "}
-                {totalPackPrice.toFixed(2)}
+                {products[0]?.packPrice}
               </p>
             </CardTitle>
 

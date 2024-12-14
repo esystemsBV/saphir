@@ -92,7 +92,7 @@ export default function AddPack({
         });
         responseMessage(response.data);
       } catch (error) {
-        responseMessage({ success: false });
+        responseMessage({ res: { success: false } });
 
         console.log(error);
       } finally {
@@ -166,8 +166,6 @@ export default function AddPack({
       }
     }
   };
-
-  console.log(selectedProducts);
 
   const handleDeleteProduct = (id: number) => {
     const updatedProducts = selectedProducts.filter((_, index) => index !== id);

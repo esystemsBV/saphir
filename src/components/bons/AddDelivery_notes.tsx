@@ -16,7 +16,7 @@ import Error from "../ui/Error";
 import fetchData from "@/apis/HandleGetTable";
 import { responseMessage } from "@/common/Functions";
 import axios from "axios";
-import { delivery_notes, products } from "@/lib/database";
+import { delivery_notes, packs, products } from "@/lib/database";
 import SelectType from "react-select";
 import { X } from "lucide-react";
 import { DataSelectionDialog } from "../ProductSelectionDialog";
@@ -26,6 +26,8 @@ export default function AddDeliveryNotes({
   refresh,
   dataToAdd,
   setDataToAdd,
+  selectedPacks,
+  setSelectedPacks,
   edit,
   setEdit,
   selectedProducts,
@@ -38,7 +40,9 @@ export default function AddDeliveryNotes({
   edit: boolean;
   setEdit: any;
   selectedProducts: products[];
+  selectedPacks: packs[];
   setSelectedProducts: any;
+  setSelectedPacks: any;
 }) {
   const [errorMessage, setErrorMessage] = useState<false | string>(false);
   const [clientSearch, setClientSearch] = useState("");
@@ -57,7 +61,7 @@ export default function AddDeliveryNotes({
     if (
       !dataToAdd?.client ||
       !dataToAdd.delivery_date ||
-      selectedProducts.length === 0
+      (selectedProducts.length === 0 && selectedPacks.length === 0)
     ) {
       setErrorMessage(t("delivery_notes.error.required_fields"));
       return;
@@ -73,6 +77,11 @@ export default function AddDeliveryNotes({
           quantity: prod.quantity,
           price: prod.sellPrice,
         })),
+        packs: selectedPacks.map((pack) => ({
+          pack_reference: pack.reference,
+          quantity: pack.quantity,
+          price: pack.price,
+        })),
       };
 
       const response: any = await axios.post(
@@ -81,7 +90,7 @@ export default function AddDeliveryNotes({
       );
       responseMessage(response.data);
     } catch (error) {
-      responseMessage({ success: false });
+      responseMessage({ res: { success: false } });
       console.error(error);
     } finally {
       setSelectedProducts([]);
@@ -118,7 +127,7 @@ export default function AddDeliveryNotes({
       );
       responseMessage(response.data);
     } catch (error) {
-      responseMessage({ success: false });
+      responseMessage({ res: { success: false } });
       console.error(error);
     } finally {
       setSelectedProducts([]);
@@ -134,6 +143,12 @@ export default function AddDeliveryNotes({
     );
     setSelectedProducts(updatedProducts);
   };
+  const handleQuantityChangePack = (id: number, newValue: number) => {
+    const updatedPacks = selectedPacks.map((prod, index) =>
+      index === id ? { ...prod, quantity: newValue } : prod
+    );
+    setSelectedPacks(updatedPacks);
+  };
 
   const handlePriceChange = (id: number, newValue: number) => {
     const updatedProducts = selectedProducts.map((prod, index) =>
@@ -142,9 +157,21 @@ export default function AddDeliveryNotes({
     setSelectedProducts(updatedProducts);
   };
 
+  const handlePriceChangePack = (id: number, newValue: number) => {
+    const updatedPacks = selectedPacks.map((prod, index) =>
+      index === id ? { ...prod, price: newValue } : prod
+    );
+    setSelectedPacks(updatedPacks);
+  };
+
   const handleDeleteProduct = (id: number) => {
     const updatedProducts = selectedProducts.filter((_, index) => index !== id);
     setSelectedProducts(updatedProducts);
+  };
+
+  const handleDeletePack = (id: number) => {
+    const updatedPacks = selectedPacks.filter((_, index) => index !== id);
+    setSelectedPacks(updatedPacks);
   };
 
   useEffect(() => {
@@ -200,7 +227,30 @@ export default function AddDeliveryNotes({
     }
   };
 
-  console.log(selectedProducts);
+  const onSelectPack = (pack: packs) => {
+    const find = selectedPacks.find((x) => x.reference === pack.reference);
+
+    const filtred = selectedPacks.filter((x) => x.reference !== pack.reference);
+
+    if (!find) {
+      setSelectedPacks([{ ...pack, price: +pack.price }, ...selectedPacks]);
+    } else {
+      setSelectedPacks([
+        { ...pack, quantity: (find.quantity || 1) + 1, price: +pack.price },
+        ...filtred,
+      ]);
+    }
+  };
+
+  const total =
+    +selectedProducts.reduce(
+      (acc, prod) => acc + (prod.sellPrice || 0) * (prod.quantity || 1),
+      0
+    ) +
+    +selectedPacks.reduce(
+      (acc, prod) => acc + (+prod.price || 0) * (prod.quantity || 1),
+      0 || 0
+    );
 
   return (
     <div>
@@ -209,13 +259,13 @@ export default function AddDeliveryNotes({
           isDisabled={edit}
           options={(clients || [])
             .filter((client) =>
-              `${client.fname} ${client.lname}`
+              `${client.fullname}`
                 .toLowerCase()
                 .includes(clientSearch.toLowerCase())
             )
             .map((client) => ({
               value: client.reference,
-              label: `${client.fname} ${client.lname}`,
+              label: `${client.fullname}`,
               ...client,
             }))}
           styles={customStyles}
@@ -278,20 +328,24 @@ export default function AddDeliveryNotes({
       <DataSelectionDialog
         className="mt-3"
         onSelectProduct={onSelectProduct}
+        onSelectPack={onSelectPack}
         ButtonTitle="select-products"
         table="/products/withfamilyname"
       />
 
+      <h1 className="text-lg font-semibold pt-5 text-end">
+        TOTAL : {total.toFixed(2)}
+      </h1>
       {/* Product Table */}
-      {selectedProducts.length > 0 && (
-        <Table aria-label={t("table")} className="mt-3">
+      {(selectedProducts.length > 0 || selectedPacks.length > 0) && (
+        <Table aria-label={t("table")} className="mt-2">
           <TableHeader>
             <TableRow>
               <TableHead>{t("image")}</TableHead>
               <TableHead>{t("products.designation")}</TableHead>
-              <TableHead>{t("products.pa")}</TableHead>
               <TableHead>{t("products.pv")}</TableHead>
               <TableHead>{t("quantity")}</TableHead>
+              <TableHead>{t("amount")}</TableHead>
               <TableHead>{t("delete")}</TableHead>
             </TableRow>
           </TableHeader>
@@ -306,7 +360,6 @@ export default function AddDeliveryNotes({
                   />
                 </TableCell>
                 <TableCell className="capitalize">{prod.name}</TableCell>
-                <TableCell>{prod.boughtPrice}</TableCell>
                 <TableCell>
                   <input
                     type="number"
@@ -328,8 +381,54 @@ export default function AddDeliveryNotes({
                   />
                 </TableCell>
                 <TableCell>
+                  {((prod.quantity || 1) * prod.sellPrice).toFixed(2)}
+                </TableCell>
+                <TableCell>
                   <div
                     onClick={() => handleDeleteProduct(id)}
+                    className="w-7 cursor-pointer bg-red-600 flex items-center justify-center text-center text-white rounded-full h-7"
+                  >
+                    <X />
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+
+            {selectedPacks.map((item, id) => (
+              <TableRow key={id}>
+                <TableCell className="w-20">
+                  <img
+                    src={item.image ? `${def}${item.image}` : brokenImage}
+                    className="size-12 object-cover rounded-sm bg-main"
+                  />
+                </TableCell>
+                <TableCell className="capitalize">{item.name}</TableCell>
+                <TableCell>
+                  <input
+                    type="number"
+                    value={+item.price || 0}
+                    min={0}
+                    onChange={(e) => handlePriceChangePack(id, +e.target.value)}
+                    className="text-center py-1 rounded-lg md:w-20 w-10"
+                  />
+                </TableCell>
+                <TableCell>
+                  <input
+                    type="number"
+                    value={item.quantity || 1}
+                    min={1}
+                    onChange={(e) =>
+                      handleQuantityChangePack(id, Number(e.target.value))
+                    }
+                    className="text-center py-1 rounded-lg md:w-20 w-10"
+                  />
+                </TableCell>
+                <TableCell>
+                  {((item.quantity || 1) * +item.price).toFixed(2)}
+                </TableCell>
+                <TableCell>
+                  <div
+                    onClick={() => handleDeletePack(id)}
                     className="w-7 cursor-pointer bg-red-600 flex items-center justify-center text-center text-white rounded-full h-7"
                   >
                     <X />
@@ -342,14 +441,14 @@ export default function AddDeliveryNotes({
       )}
 
       <div
-        className="fixed p-5 bottom-0 z-50 bg-white left-0 w-full "
+        className="fixed p-5 max-w-screen-2xl flex justify-end w-full bottom-0 z-50 bg-white"
         onClick={edit ? handleEditDeliveryNote : handleAddDeliveryNote}
       >
         <Button
           size="lg"
-          className="bg-green-500 hover:bg-green-600 text-white"
+          className="bg-green-500 hover:bg-green-600 w-max text-white"
         >
-          {t("submit")}
+          {t("submit")} ({total.toFixed(2)})
         </Button>
       </div>
 

@@ -60,8 +60,7 @@ export default function Users() {
         <AccordionItem value="1">
           <AccordionTrigger>
             <Button className="bg-blue-500 hover:bg-blue-700">
-              <Plus />{" "}
-              {updating ? "Modifier un utilisateur" : "Ajouter un utilisateur"}
+              <Plus /> {updating ? t("users.edit") : t("users.add")}
             </Button>
           </AccordionTrigger>
           <AccordionContent>

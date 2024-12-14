@@ -1,10 +1,9 @@
+import { handleLogOut } from "@/apis/HandleLogOut";
 import Logo from "@/assets/logo";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
 export default function LogOutPage() {
-  const handleLogout = async () => {};
-
   return (
     <div className="flex items-center gap-5 flex-col px-5 justify-center w-screen h-screen">
       <Logo className="w-52 mx-auto text-main" />
@@ -13,7 +12,7 @@ export default function LogOutPage() {
       </p>
 
       <div className="grid md:grid-cols-2 w-full md:w-1/2 items-center gap-2 md:gap-5">
-        <Button onClick={handleLogout}>Oui, me déconnecter</Button>
+        <Button onClick={handleLogOut}>Oui, me déconnecter</Button>
 
         <Button variant="outline">
           <Link

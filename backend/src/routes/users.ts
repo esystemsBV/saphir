@@ -1,8 +1,19 @@
-import express, { query } from "express";
+import express from "express";
 import { db } from "../config/sqldb";
 import { users } from "../types";
 
 const router = express.Router();
+
+router.get("/fetch/:type", (req, res) => {
+  const type = req.params.type;
+
+  const q = `SELECT * FROM users WHERE role = '${type}'`;
+  db.query(q, (err, results) => {
+    if (err) return res.json({ success: false, error: err });
+
+    return res.json({ success: true, data: results });
+  });
+});
 
 router.post("/add", (req, res) => {
   const { fname, lname, phone, email, role, password }: users = req.body;

@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import Logo from "@/assets/logo";
 import Error from "@/components/ui/Error";
 import LoadingLogo from "@/components/others/LoadingLogo";
+import { def } from "@/data/Links";
+import axios from "axios";
 
 export default function LoginPage() {
   const [loginInfos, setLoginInfos] = useState({ email: "", password: "" });
@@ -16,8 +18,15 @@ export default function LoginPage() {
     setError("");
 
     try {
-      await "";
-      navigate("/");
+      const response = await axios.post(`${def}/auth/login`, loginInfos, {
+        withCredentials: true,
+        withXSRFToken: true,
+      });
+      if (response.data.success) {
+        navigate("/");
+      } else {
+        setError("Erreur veuillez entrer des informations valides!");
+      }
     } catch (error) {
       setError("Erreur veuillez entrer des informations valides!");
     } finally {

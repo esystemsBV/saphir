@@ -104,7 +104,7 @@ export default function ViewProduct() {
               <img
                 src={product?.image ? `${def}${product.image}` : brokenImage}
                 alt={product.name}
-                className="h-52 w-max object-cover"
+                className="h-52 w-max mx-auto pt-2 md:p-0 object-cover"
               />
               <div className="p-6 flex flex-col flex-grow justify-between">
                 <h1 className="text-3xl font-bold mb-4">{product.name}.</h1>

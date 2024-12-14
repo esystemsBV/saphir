@@ -41,7 +41,7 @@ export default function AddProduct({
 
   const handleAddProduct = async () => {
     if (!selectedProduct?.name) {
-      responseMessage({ success: false });
+      responseMessage({ res: { success: false } });
     } else {
       setLoadingBtn(true);
 
@@ -69,7 +69,7 @@ export default function AddProduct({
         );
         responseMessage(response.data);
       } catch (error) {
-        responseMessage({ success: false });
+        responseMessage({ res: { success: false } });
       } finally {
         setLoadingBtn(false);
         refresh();
@@ -81,7 +81,7 @@ export default function AddProduct({
 
   const handleEditProduct = async () => {
     if (!selectedProduct?.name) {
-      responseMessage({ success: false });
+      responseMessage({ res: { success: false } });
     } else {
       setLoadingBtn(true);
 
@@ -95,7 +95,7 @@ export default function AddProduct({
         });
         responseMessage(response.data);
       } catch (error) {
-        responseMessage({ success: false });
+        responseMessage({ res: { success: false } });
       } finally {
         setLoadingBtn(false);
         refresh();

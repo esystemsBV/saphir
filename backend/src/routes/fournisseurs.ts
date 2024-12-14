@@ -7,8 +7,7 @@ const router = express.Router();
 router.post("/add", (req, res) => {
   const {
     address,
-    fname,
-    lname,
+    fullname,
     phone,
     company_rc,
     company_if,
@@ -18,14 +17,13 @@ router.post("/add", (req, res) => {
   } = req.body;
 
   const query =
-    "INSERT INTO fournisseurs (address, fname, lname, phone, company_rc, company_if, company_tp, company_ice, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    "INSERT INTO fournisseurs (address, fullname, phone, company_rc, company_if, company_tp, company_ice, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
   db.query(
     query,
     [
       address,
-      fname,
-      lname,
+      fullname,
       phone,
       company_rc,
       company_if,
@@ -46,8 +44,7 @@ router.post("/add", (req, res) => {
 router.put("/edit", (req, res) => {
   const {
     address,
-    fname,
-    lname,
+    fullname,
     phone,
     company_rc,
     company_if,
@@ -58,14 +55,13 @@ router.put("/edit", (req, res) => {
   } = req.body;
 
   const query =
-    "UPDATE fournisseurs SET address=?, fname=?, lname=?, phone=?, company_rc=?, company_if=?, company_tp=?, company_ice=?, type=? WHERE reference=?";
+    "UPDATE fournisseurs SET address=?, fullname=?, phone=?, company_rc=?, company_if=?, company_tp=?, company_ice=?, type=? WHERE reference=?";
 
   db.query(
     query,
     [
       address,
-      fname,
-      lname,
+      fullname,
       phone,
       company_rc,
       company_if,

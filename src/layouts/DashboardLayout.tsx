@@ -17,13 +17,13 @@ export default function DashboardLayout() {
       <div
         onClick={event}
         style={{ display: sidebarOpen ? "block" : "none" }}
-        className="bg-black/50 animate-in z-50 fixed w-screen h-screen"
+        className="bg-black/50 animate-in z-[90] fixed w-screen h-screen"
       />
       <DashboardSideBar isOpen={sidebarOpen} event={event} />
 
       <DashboardNavBar event={event} />
 
-      <div className="max-w-screen-2xl mx-5 px-5 2xl:px-0 md:mx-auto pb-28">
+      <div className="max-w-screen-2xl mx-5 2xl:px-0 2xl:mx-auto pb-28">
         <Outlet />
       </div>
     </>

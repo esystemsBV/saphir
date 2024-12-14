@@ -114,7 +114,7 @@ export default function AddUser({
               "cashier",
             ].map((value, id) => (
               <SelectItem key={id} value={value} className="capitalize">
-                {t(`roles.${value}`)}
+                {t(`${value}`)}
               </SelectItem>
             ))}
           </SelectContent>

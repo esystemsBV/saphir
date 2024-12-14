@@ -79,7 +79,7 @@ export default function RetourClientNoteView() {
               <h3 className="font-semibold mb-2">{t("client")}:</h3>
               {deliveryNote.type === "client" ? (
                 <>
-                  <p>{deliveryNote.client_name}</p>
+                  <p>{deliveryNote.client_fullname}</p>
                   <p>{deliveryNote.client_phone}</p>
                 </>
               ) : (

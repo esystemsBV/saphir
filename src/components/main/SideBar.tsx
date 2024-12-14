@@ -11,6 +11,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { sidebarItems } from "@/data/Pages";
+import { useUser } from "@/hooks/useUserContext";
 
 interface DashboardSideBarProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ export default function DashboardSideBar({
   event,
 }: DashboardSideBarProps) {
   const [isMobile, setIsMobile] = useState(false);
+  const { user } = useUser();
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -29,6 +31,18 @@ export default function DashboardSideBar({
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
+  const filteredSidebarItems = sidebarItems
+    .filter((item) => item.roles?.includes(user?.role || "admin"))
+    .map((item) => {
+      if (item.children) {
+        const filteredChildren = item.children.filter((_) =>
+          item.roles?.includes(user?.role || "admin")
+        );
+        return { ...item, children: filteredChildren };
+      }
+      return item;
+    });
 
   const SidebarContent = (
     <div
@@ -48,7 +62,7 @@ export default function DashboardSideBar({
 
       <ScrollArea className="flex-grow">
         <Accordion type="single" collapsible className="w-full">
-          {sidebarItems.map((item, index) => (
+          {filteredSidebarItems.map((item, index) => (
             <AccordionItem value={`item-${index}`} key={index}>
               {item.children ? (
                 <>

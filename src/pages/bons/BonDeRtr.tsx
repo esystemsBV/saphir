@@ -121,7 +121,7 @@ export default function BonDeRtr() {
                 <TableCell>{`${
                   retour_client_notes.type === "pos"
                     ? t("client_pos")
-                    : `${retour_client_notes.client.fname} ${retour_client_notes.client.lname}`
+                    : `${retour_client_notes.client.fullname}`
                 }`}</TableCell>
                 <TableCell>
                   {formatDate(retour_client_notes.delivery_date)}
@@ -150,7 +150,7 @@ export default function BonDeRtr() {
                               ...retour_client_notes.client,
                               label:
                                 retour_client_notes.type === "client"
-                                  ? `${retour_client_notes.client.fname} ${retour_client_notes.client.lname}`
+                                  ? `${retour_client_notes.client.fullname}`
                                   : t("client_pos"),
                             },
                           });

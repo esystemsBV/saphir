@@ -1,5 +1,6 @@
 import LoadingLogo from "@/components/others/LoadingLogo";
 import { Toaster } from "@/components/ui/toaster";
+import { UserProvider } from "@/hooks/useUserContext";
 import Router from "@/routes/router";
 import { useEffect, useState } from "react";
 
@@ -16,8 +17,10 @@ export default function App() {
 
   return (
     <div className="font-poppins">
-      <Toaster />
-      <Router />
+      <UserProvider>
+        <Toaster />
+        <Router />
+      </UserProvider>
     </div>
   );
 }

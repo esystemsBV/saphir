@@ -3,6 +3,14 @@ export interface response {
   error?: string;
 }
 
+export type paimentsTypes =
+  | "cash"
+  | "tpe"
+  | "cheque"
+  | "effect"
+  | "virement"
+  | "others";
+
 export interface families {
   reference?: number;
   name: string;
@@ -17,6 +25,7 @@ export interface products {
   familyName?: string;
   name: string;
   stock?: number;
+  newstock?: number;
   boughtPrice: number;
   sellPrice: number;
 }
@@ -24,8 +33,9 @@ export interface products {
 export interface packs {
   reference: number;
   image: string | null;
+  quantity?: number;
   name: string;
-  price: string;
+  price: number;
   productsReferences: string[];
 }
 
@@ -52,8 +62,7 @@ export interface PackProductFamily {
 export interface clients {
   reference: number;
   address?: string;
-  fname: string;
-  lname: string;
+  fullname: string;
   phone: string;
   company_rc?: number;
   company_if?: number;
@@ -65,8 +74,7 @@ export interface clients {
 export interface fournisseurs {
   reference: number;
   address?: string;
-  fname: string;
-  lname: string;
+  fullname: string;
   phone: string;
   company_rc?: number;
   company_if?: number;
@@ -111,10 +119,11 @@ export interface delivery_notes_by_id {
   delivery_date: string;
   short_delivery_date: string;
   created_date: string;
-  client_name: string;
+  client_fullname: string;
   remise: number;
   client_phone: string;
   products: products[];
+  packs: packs[];
   total_price: number;
   status: "in_progress" | "completed";
   type: "pos" | "client" | "order";
@@ -137,4 +146,34 @@ export interface agencies {
   name: string;
   phone: string;
   responsible: string;
+}
+
+export interface order {
+  products?: products[];
+  reference?: number;
+  fullname: string;
+  phone: string;
+  whatsapp?: string;
+  address: string;
+  city: string;
+  agence: null | number;
+  livreur: null | number;
+  preparateur: null | number;
+  ncolis: number;
+  notes: null | string;
+  payment_method: paimentsTypes;
+  is_company: boolean;
+  order_date: string;
+  order_time: string;
+  ice: string | null;
+  siegesocial: string | null;
+  createdAt?: string;
+  raisonsocial: string | null;
+  statut?:
+    | "new"
+    | "prepared"
+    | "collected"
+    | "shipping"
+    | "delivered"
+    | "payed";
 }

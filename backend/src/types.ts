@@ -1,7 +1,7 @@
 import { SessionData } from "express-session";
 
 export interface CustomSession extends SessionData {
-  user?: { name: string; role: string };
+  user?: { fname: string; lname: string; role: string; reference: number };
 }
 
 export interface users {

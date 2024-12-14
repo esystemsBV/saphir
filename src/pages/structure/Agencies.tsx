@@ -16,12 +16,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { LoadingSpinning } from "@/components/ui/loadingspining";
-import fetchData from "@/apis/HandleGetTable";
 import { EditIcon, Plus, Trash2 } from "lucide-react";
 import { HandleDelete } from "@/apis/HandleDelete";
 import { Button } from "@/components/ui/button";
 import { agencies } from "@/lib/database";
 import AddAgencies from "./AddAgencies";
+import FetchTableURL from "@/apis/HandleGetElement";
 
 export default function Agencies() {
   const { t } = useTranslation();
@@ -31,9 +31,10 @@ export default function Agencies() {
     data,
     refresh,
     loading,
-  }: { data: agencies[]; refresh: () => void; loading: boolean } = fetchData({
-    page: "agencies",
-  });
+  }: { data: agencies[]; refresh: () => void; loading: boolean } =
+    FetchTableURL({
+      url: "/agencies",
+    });
   const [updating, setUpdating] = useState(false);
   const [openKeys, setOpenKeys] = useState<string[]>([]);
 
@@ -59,8 +60,7 @@ export default function Agencies() {
         <AccordionItem value="1">
           <AccordionTrigger>
             <Button className="bg-blue-500 hover:bg-blue-700">
-              <Plus />{" "}
-              {updating ? "Modifier un utilisateur" : "Ajouter un utilisateur"}
+              <Plus /> {updating ? t("agencies.update") : t("agencies.add")}
             </Button>
           </AccordionTrigger>
           <AccordionContent>

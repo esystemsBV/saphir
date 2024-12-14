@@ -2,8 +2,20 @@ import express from "express";
 import { db } from "../config/sqldb";
 import { CustomSession, users } from "../types";
 import { ResultSetHeader } from "mysql2";
+import session from "express-session";
 
 const router = express.Router();
+
+router.use(
+  session({
+    secret: "saphirwebbackendsecretkey2029",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false,
+    },
+  })
+);
 
 router.get("/check", (req, res: any) => {
   const session = req.session as CustomSession;
@@ -16,17 +28,36 @@ router.get("/check", (req, res: any) => {
 });
 
 router.post("/login", (req, res) => {
-  const pass = req.body.password;
-  const query = "SELECT name, role FROM users WHERE password = ?";
+  const { password, email } = req.body;
+  const query =
+    "SELECT fname, lname, banned, reference, role FROM users WHERE password = ? and email = ?";
 
-  db.query(query, [pass], (err, results: any[]) => {
-    if (err) return res.status(500).json({ message: "error-support-message" });
+  db.query(query, [password, email], (err, results: any[]) => {
+    if (err)
+      return res
+        .status(500)
+        .json({ success: false, message: "error-support-message", err: err });
     if (results.length === 0)
-      return res.status(404).json({ message: "wrong-password" });
+      return res
+        .status(404)
+        .json({ success: false, message: "wrong-password" });
+
+    if (results[0].banned)
+      return res.status(404).json({ success: false, message: "user-banned" });
 
     const session = req.session as CustomSession;
-    session.user = { name: results[0].name, role: results[0].role };
-    return res.json({ message: "login-success", user: session.user });
+
+    session.user = {
+      fname: results[0].fname,
+      lname: results[0].lname,
+      role: results[0].role,
+      reference: results[0].reference,
+    };
+    return res.json({
+      success: true,
+      message: "login-success",
+      user: session.user,
+    });
   });
 });
 
