@@ -16,10 +16,16 @@ const AuthenticationLayout: React.FC = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await axios.post(`${def}/auth/check`, {
-          withCredentials: true,
-          withXSRFToken: true,
-        });
+        const response = await axios.post(
+          `${def}/auth/check`,
+          {
+            token: localStorage.getItem("authToken"),
+          },
+          {
+            withCredentials: true,
+            withXSRFToken: true,
+          }
+        );
 
         setAuthenticated(response.data.isAuthenticated);
         setUser(response.data.user as users);

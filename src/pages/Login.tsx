@@ -27,6 +27,7 @@ export default function LoginPage() {
         withXSRFToken: true,
       });
       if (response.data.success) {
+        localStorage.setItem("authToken", response.data.token);
         navigate("/");
       } else {
         setError("Erreur veuillez entrer des informations valides!");

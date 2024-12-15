@@ -2,7 +2,6 @@ import express from "express";
 import { db } from "../config/sqldb";
 const router = express.Router();
 import { customAlphabet } from "nanoid";
-import { ResultSetHeader } from "mysql2";
 
 router.post("/add", (req, res) => {
   const referenceInDo = customAlphabet("1234567890", 9);

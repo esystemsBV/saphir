@@ -2,24 +2,47 @@ import express from "express";
 import { db } from "../config/sqldb";
 import { CustomSession, users } from "../types";
 import { ResultSetHeader } from "mysql2";
-
 const router = express.Router();
+import { customAlphabet } from "nanoid";
+
+const JWT_SECRET = "SAPHIRwebSECRETKEY2024";
 
 router.post("/check", (req, res: any) => {
   const session = req.session as CustomSession;
+  const { token } = req.body;
 
-  if (session.user) {
-    return res.json({
-      isAuthenticated: true,
-      user: session.user,
-      err: req.session,
-    });
-  } else {
-    return res.json({ isAuthenticated: false, err: req.session });
-  }
+  db.query(
+    "SELECT * FROM logins WHERE token = ?",
+    [token],
+    (err, results: any) => {
+      if (err) {
+        return res.status(500).json({
+          isAuthenticated: false,
+          message: "error-support-message",
+          err: err,
+        });
+      }
+      if (results.length === 0) {
+        return res
+          .status(404)
+          .json({ isAuthenticated: false, message: "wrong-password" });
+      }
+
+      const user = JSON.parse(results[0].user);
+
+      return res.json({
+        isAuthenticated: true,
+        user: user,
+      });
+    }
+  );
 });
 
 router.post("/login", (req, res) => {
+  const referenceInDo = customAlphabet("1234567890", 5);
+  const referenceX = referenceInDo();
+  const token = `${referenceX}-${JWT_SECRET}`;
+
   const { password, email } = req.body;
   const query =
     "SELECT fname, lname, banned, reference, role FROM users WHERE password = ? and email = ?";
@@ -37,19 +60,31 @@ router.post("/login", (req, res) => {
     if (results[0].banned)
       return res.status(404).json({ success: false, message: "user-banned" });
 
-    const session = req.session as CustomSession;
-
-    session.user = {
+    const user = {
       fname: results[0].fname,
       lname: results[0].lname,
       role: results[0].role,
       reference: results[0].reference,
     };
-    return res.json({
-      success: true,
-      message: "login-success",
-      user: session.user,
-    });
+    db.query(
+      "INSERT INTO logins (user, token) VALUES (?, ?)",
+      [JSON.stringify(user), token],
+      (err) => {
+        if (err)
+          return res.status(500).json({
+            success: false,
+            message: "error-support-message",
+            err: err,
+          });
+
+        return res.json({
+          success: true,
+          message: "login-success",
+          user: user,
+          token,
+        });
+      }
+    );
   });
 });
 
