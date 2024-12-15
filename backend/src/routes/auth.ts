@@ -113,13 +113,20 @@ router.post("/register", (req, res: any) => {
   });
 });
 
-router.get("/logout", (req, res) => {
-  req.session.destroy((err) => {
-    if (err) return res.status(500).send("error-logging-out");
-    res.clearCookie("connect.sid");
-    return res.json({ message: "logout-success", success: true });
+router.post("/logout", (req, res) => {
+  const { token } = req.body;
+  db.query("DELETE FROM logins WHERE token = ?", [token], (err) => {
+    if (err) {
+      return res.status(500).json({
+        success: false,
+        message: "error-support-message",
+        err: err,
+      });
+    }
+    return res.json({ success: true, message: "logout-success" });
   });
 });
+
 router.put("/update", (req: any, res: any) => {
   const { id, name, password, role } = req.body;
 

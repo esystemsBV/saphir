@@ -3,9 +3,8 @@ import axios from "axios";
 
 export const handleLogOut = async () => {
   try {
-    const response = await axios.get(`${def}/auth/logout`, {
-      withCredentials: true,
-      withXSRFToken: true,
+    const response = await axios.post(`${def}/auth/logout`, {
+      token: localStorage.getItem("authToken"),
     });
     if (response.data.success) {
       window.location.reload();
