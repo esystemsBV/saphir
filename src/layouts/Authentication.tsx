@@ -16,12 +16,9 @@ const AuthenticationLayout: React.FC = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await axios.get(`${def}/auth/check`, {
+        const response = await axios.post(`${def}/auth/check`, {
           withCredentials: true,
           withXSRFToken: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
         });
 
         setAuthenticated(response.data.isAuthenticated);

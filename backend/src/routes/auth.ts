@@ -17,7 +17,7 @@ router.use(
   })
 );
 
-router.get("/check", (req, res: any) => {
+router.post("/check", (req, res: any) => {
   const session = req.session as CustomSession;
 
   if (session.user) {
