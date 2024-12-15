@@ -30,6 +30,7 @@ import {
   Package,
   Package2Icon,
   Home,
+  Bell,
 } from "lucide-react";
 import Users from "@/pages/structure/Users";
 import Agencies from "@/pages/structure/Agencies";
@@ -140,6 +141,12 @@ export const sidebarItems = [
     icon: SettingsIcon,
     roles: ["admin"],
     to: "/settings",
+  },
+  {
+    label: "Notifications",
+    icon: Bell,
+    roles: allRoles,
+    to: "/notifications",
   },
 ];
 
