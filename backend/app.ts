@@ -47,14 +47,14 @@ app.use(
   })
 );
 
-// const storage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     cb(null, "uploads/");
-//   },
-//   filename: function (req, file, cb) {
-//     cb(null, Date.now() + path.extname(file.originalname));
-//   },
-// });
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
 
 const VAPID_PUBLIC_KEY =
   "BNpyBg350PH9VwmvUAmoJboV7ZaMH044BRelTiw3buFKyJr9QnhBLOF_54lIzPlEEK8JK6HKERdUSriDFH8VA44";
@@ -68,7 +68,7 @@ webPush.setVapidDetails(
 
 app.use(bodyParser.json());
 
-// export const upload = multer({ storage: storage });
+export const upload = multer({ storage: storage });
 
 app.use("/auth", authRoutes);
 app.use("/table", tableRoutes);
@@ -84,9 +84,9 @@ app.use("/users", usersRoutes);
 app.use("/agencies", agenciesRoutes);
 app.use("/orders", ordersRoutes);
 
-// app.get("/uploads/*", (req: any, res) => {
-//   res.sendFile(path.join(__dirname, "../uploads", req.params[0]));
-// });
+app.get("/uploads/*", (req: any, res) => {
+  res.sendFile(path.join(__dirname, "../uploads", req.params[0]));
+});
 
 app.post("/api/save-subscription", async (req: any, res: any) => {
   const { userId, subscription } = req.body;
@@ -118,7 +118,6 @@ app.post("/api/save-subscription", async (req: any, res: any) => {
   );
 });
 
-// API: Send notification
 app.post("/api/send-notification", async (req: any, res: any) => {
   const { userId, payload } = req.body;
 
