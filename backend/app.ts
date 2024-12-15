@@ -1,5 +1,4 @@
 import express from "express";
-import session from "express-session";
 import cors from "cors";
 import dotenv from "dotenv";
 import { authRoutes } from "./src/routes/auth";
@@ -26,16 +25,19 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-app.use(
-  session({
-    secret: "saphirwebbackendsecretkey2029",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: false,
-    },
-  })
-);
+// app.use(
+//   session({
+//     secret: "saphirwebbackendsecretkey2029",
+//     resave: false,
+//     saveUninitialized: false,
+//     cookie: {
+//       secure: false,
+//     },
+//     store: MongoStore.create({
+//       mongoUrl: "mongodb://localhost:27017/sessiondb", // Replace with your MongoDB URI
+//     }),
+//   })
+// );
 
 app.use(
   cors({
@@ -173,6 +175,10 @@ app.post("/api/send-notification", async (req: any, res: any) => {
       }
     }
   );
+});
+
+app.get("/", (req, res) => {
+  res.send("Hello, Vercel with Redis and TypeScript!");
 });
 
 app.listen(process.env.PORT, () => {

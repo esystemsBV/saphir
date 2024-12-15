@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"npx vite\" \"cd backend && npx nodemon --exec npx ts-node src/app.ts\"",
+    "dev": "concurrently \"npx vite\" \"cd backend && npx nodemon --exec npx ts-node app.ts\"",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "test": "tsc -b",
@@ -29,6 +29,7 @@
     "chart.js": "^4.4.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "connect-redis": "^8.0.1",
     "date-fns": "^4.1.0",
     "framer-motion": "^11.11.17",
     "i18next": "^24.0.0",
@@ -45,6 +46,7 @@
     "react-resizable-panels": "^2.1.7",
     "react-router-dom": "^7.0.1",
     "react-select": "^5.8.3",
+    "redis": "^4.7.0",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
     "web-push": "^3.6.7"
