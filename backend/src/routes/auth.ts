@@ -2,21 +2,8 @@ import express from "express";
 import { db } from "../config/sqldb";
 import { CustomSession, users } from "../types";
 import { ResultSetHeader } from "mysql2";
-import session from "express-session";
 
 const router = express.Router();
-
-router.use(
-  session({
-    secret: "saphirwebbackendsecretkey2029",
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-      secure: true,
-      sameSite: "none",
-    },
-  })
-);
 
 router.post("/check", (req, res: any) => {
   const session = req.session as CustomSession;
