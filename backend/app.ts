@@ -31,16 +31,17 @@ app.use(
   session({
     secret: "saphirwebbackendsecretkey2029",
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: {
       secure: true,
+      sameSite: "none",
     },
   })
 );
 
 app.use(
   cors({
-    origin: true,
+    origin: "https://saphirweb.vercel.app",
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type"],
     credentials: true,
