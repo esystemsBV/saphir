@@ -7,10 +7,14 @@ import { def } from "@/data/Links";
 import axios from "axios";
 
 export default function LoginPage() {
+  axios.defaults.withCredentials = true;
+
   const [loginInfos, setLoginInfos] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<false | string>(false);
   const navigate = useNavigate();
+
+  if (loading) return <LoadingLogo />;
 
   const submitLogin = async (e: any) => {
     e.preventDefault();
@@ -88,7 +92,7 @@ export default function LoginPage() {
             type="submit"
             className="w-full mt-5 text-white bg-main py-2.5 duration-300 hover:opacity-70 rounded-lg"
           >
-            {loading ? <LoadingLogo /> : "Se connecter"}
+            {"Se connecter"}
           </button>
         </form>
       </div>

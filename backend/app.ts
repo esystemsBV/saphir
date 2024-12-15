@@ -40,7 +40,7 @@ app.use(
 
 app.use(
   cors({
-    origin: true,
+    origin: "https://saphirweb.vercel.app",
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type"],
     credentials: true,

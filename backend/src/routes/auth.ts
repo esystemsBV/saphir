@@ -21,9 +21,13 @@ router.get("/check", (req, res: any) => {
   const session = req.session as CustomSession;
 
   if (session.user) {
-    return res.json({ isAuthenticated: true, user: session.user });
+    return res.json({
+      isAuthenticated: true,
+      user: session.user,
+      err: req.session,
+    });
   } else {
-    return res.json({ isAuthenticated: false });
+    return res.json({ isAuthenticated: false, err: req.session });
   }
 });
 
