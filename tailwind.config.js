@@ -53,7 +53,7 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        poppins: ["Poppins", "sans-serif"],
+        poppins: ["Montserrat", "sans-serif"],
       },
     },
   },
