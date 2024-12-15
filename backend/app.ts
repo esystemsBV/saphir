@@ -19,10 +19,24 @@ import { ordersRoutes } from "./src/routes/order";
 import webPush from "web-push";
 import bodyParser from "body-parser";
 import { db } from "./src/config/sqldb";
+import session from "express-session";
 
 dotenv.config();
 
 const app = express();
+
+app.use(express.json());
+
+app.use(
+  session({
+    secret: "saphirwebbackendsecretkey2029",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false,
+    },
+  })
+);
 
 app.use(
   cors({
