@@ -37,7 +37,7 @@ export function ContactForm() {
 
     try {
       const response = await axios.post(
-        "http://server.saphirweb.ma/api/google-sheets",
+        "https://server.saphirweb.ma/api/google-sheets",
         JSON.stringify(formData),
         {
           headers: { "Content-Type": "application/json" },
