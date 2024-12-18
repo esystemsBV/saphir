@@ -22,5 +22,5 @@ export default {
     },
   },
   darkMode: "",
-  plugins: [require("tailwindcss-animate")],
+  plugins: [],
 };
