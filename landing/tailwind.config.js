@@ -1,10 +1,7 @@
 const { nextui } = require("@nextui-org/react");
 
 export default {
-  content: [
-    "./src/**/*.{jd,jsx,ts,tsx}",
-    "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
       animation: {
@@ -12,7 +9,6 @@ export default {
       },
       fontFamily: {
         inter: ["Ubuntu", "sans-serif"],
-        arabic: ["IBM Plex Sans Arabic", "sans-serif"],
       },
 
       keyframes: {
@@ -75,5 +71,5 @@ export default {
     },
   },
   darkMode: "class",
-  plugins: [nextui(), require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate")],
 };
