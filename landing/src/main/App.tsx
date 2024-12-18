@@ -62,7 +62,7 @@ export default function LandingPage() {
         </nav>
       </header> */}
 
-        <div className="mx-5 sticky top-5">
+        <div className="mx-5 sticky top-5 z-50">
           <nav className=" sticky top-5 w-full rounded-2xl max-w-screen-2xl border 2xl:mx-auto py-1 px-3 left-0 right-0 bg-white/70 dark:bg-gray-900/70 backdrop-blur-md shadow-lg z-50 border-b border-pink-100 dark:border-pink-800/30">
             <div className="container mx-auto px-4 py-2 flex justify-between items-center">
               <Logo className="h-9 text-[#B12B89]" />
