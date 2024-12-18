@@ -179,7 +179,7 @@ export default function Tests() {
         <section className="mt-10">
           <Title title={`Statistiques de Revenus`} />
 
-          <div className="grid grid-cols-1 w-full md:grid-cols-2 gap-4 py-4">
+          <div className="md:grid space-y-5 md:space-y-0 grid-cols-1 w-full md:grid-cols-2 gap-4 py-4">
             {/* Graphique Point de Vente */}
             <Card>
               <CardHeader>
