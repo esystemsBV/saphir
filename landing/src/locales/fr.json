@@ -1,1 +1,28 @@
-{ "hello": "Hello World" }
+{
+  "header": {
+    "title": "Gérez Votre Entreprise en Toute Simplicité.",
+    "description": "La plateforme tout-en-un qui vous aide à gérer vos opérations, votre équipe et votre croissance ou votre business e-commerce - le tout au même endroit.",
+    "start": "Demander un démo"
+  },
+  "landingPage": {
+    "contact": {
+      "title": "Contactez-nous",
+      "description": "Prêt à transformer votre entreprise ? Parlons-en !"
+    },
+    "footer": {
+      "copyright": "© 2024 SAPHIR CAISSE. Tous droits réservés."
+    },
+    "stats": {
+      "clients": "Nos Clients"
+    }
+  },
+  "fullname": "Nom Complet",
+  "phone": "Téléphone",
+  "message": "Message",
+  "email": "Email",
+  "send": "Valider",
+  "loading": "Chargement...",
+  "enter-fullname": "Entrer votre nom complet",
+  "enter-phone": "Entrer votre numéro de téléphone",
+  "enter-message": "Entrer votre message"
+}

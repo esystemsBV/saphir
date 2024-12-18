@@ -3,6 +3,7 @@ import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import Backend from "i18next-http-backend";
 import frTranslation from "../locales/fr.json";
+import arTranslation from "../locales/ar.json";
 
 i18n
   .use(Backend)
@@ -11,6 +12,7 @@ i18n
   .init({
     resources: {
       fr: { translation: frTranslation },
+      ar: { translation: arTranslation },
     },
     fallbackLng: "fr",
     interpolation: {

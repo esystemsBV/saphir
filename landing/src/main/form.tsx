@@ -4,6 +4,7 @@ import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
 import { toast } from "../hooks/use-toast";
 import axios from "axios";
+import { t } from "i18next";
 
 interface FormData {
   nom: string;
@@ -80,14 +81,14 @@ export function ContactForm() {
           className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           htmlFor="nom"
         >
-          Nom Complet
+          {t("fullname")}
         </label>
         <Input
           id="nom"
           name="nom"
           value={formData.nom}
           onChange={handleChange}
-          placeholder="Zakaryae Ennaciri"
+          placeholder={t("enter-fullname")}
           required
           disabled={isLoading}
         />
@@ -97,14 +98,14 @@ export function ContactForm() {
           className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           htmlFor="email"
         >
-          Email
+          {t("email")}
         </label>
         <Input
           id="email"
           name="email"
           value={formData.email}
           onChange={handleChange}
-          placeholder="example@example.com"
+          placeholder={"example@example.com"}
           required
           type="email"
           disabled={isLoading}
@@ -115,16 +116,16 @@ export function ContactForm() {
           className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           htmlFor="telephone"
         >
-          Téléphone
+          {t("phone")}
         </label>
         <Input
           id="telephone"
           name="telephone"
           value={formData.telephone}
           onChange={handleChange}
-          placeholder="+212 612345678 | 0612345678"
+          placeholder={t("enter-phone")}
           required
-          type="tel"
+          type="text"
           disabled={isLoading}
         />
       </div>
@@ -133,25 +134,25 @@ export function ContactForm() {
           className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           htmlFor="message"
         >
-          Message
+          {t("message")}
         </label>
         <Textarea
           id="message"
           name="message"
           value={formData.message}
           onChange={handleChange}
-          placeholder="Comment pouvons-nous vous aider ?"
+          placeholder={t("enter-message")}
           required
           className="h-24"
           disabled={isLoading}
         />
       </div>
       <Button
-        className="w-full bg-[#B12B89] hover:bg-[#901d6d]"
+        className="w-full bg-[#B12B89] text-white hover:bg-[#901d6d]"
         type="submit"
         disabled={isLoading}
       >
-        {isLoading ? "Envoi en cours..." : "Envoyer"}
+        {isLoading ? t("loading") : t("send")}
       </Button>
     </form>
   );
